@@ -17,32 +17,33 @@ export async function POST(req: NextRequest) {
   });
 
   if (!user?.telegramId) {
-    return NextResponse.json({
-      error: "Ваш аккаунт не подключён к MAX боту. Зайдите в /dashboard и подключите бота.",
-    }, { status: 400 });
+    return NextResponse.json({ error: "telegramId не сохранён в БД" }, { status: 400 });
   }
 
-  const text =
-    `🧪 Тест уведомлений\n\n` +
-    `Привет, ${user.name ?? "администратор"}!\n\n` +
-    `Если вы это видите — MAX Bot настроен корректно. ✅\n\n` +
-    `Платформа работает и готова к продаже:\n` +
-    `https://ar1-production.up.railway.app`;
+  const maxUserId = Number(user.telegramId);
+  const text = `🧪 Тест уведомлений\n\nПривет, ${user.name ?? "администратор"}!\n\nMAX Bot работает ✅`;
 
-  const res = await fetch(`${BASE}/messages?access_token=${BOT_TOKEN}`, {
+  // Try user_id
+  const r1 = await fetch(`${BASE}/messages?access_token=${BOT_TOKEN}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      recipient: { user_id: Number(user.telegramId) },
-      body: { text },
-    }),
+    body: JSON.stringify({ recipient: { user_id: maxUserId }, body: { text } }),
   });
+  const d1 = await r1.json();
 
-  const data = await res.json();
+  if (!d1.code) return NextResponse.json({ ok: true, method: "user_id", sentTo: maxUserId });
 
-  if (!res.ok || data.code) {
-    return NextResponse.json({ error: data.message ?? "Ошибка отправки", raw: data }, { status: 500 });
-  }
+  // Try chat_id (same value — MAX uses same id for DM chats)
+  const r2 = await fetch(`${BASE}/messages?access_token=${BOT_TOKEN}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ recipient: { chat_id: maxUserId }, body: { text } }),
+  });
+  const d2 = await r2.json();
 
-  return NextResponse.json({ ok: true, sentTo: user.telegramId });
+  return NextResponse.json({
+    debug: { storedId: user.telegramId, maxUserId },
+    user_id_result: d1,
+    chat_id_result: d2,
+  });
 }
