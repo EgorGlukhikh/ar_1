@@ -60,39 +60,45 @@ export default async function DashboardPage() {
 
       {/* Stats */}
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardContent className="flex items-center gap-4 pt-6">
-            <div className="rounded-full bg-blue-100 p-3">
-              <BookOpen className="h-5 w-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{enrollments.length}</p>
-              <p className="text-sm text-muted-foreground">Курсов</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4 pt-6">
-            <div className="rounded-full bg-yellow-100 p-3">
-              <Award className="h-5 w-5 text-yellow-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{certificates}</p>
-              <p className="text-sm text-muted-foreground">Сертификатов</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4 pt-6">
-            <div className="rounded-full bg-green-100 p-3">
-              <MessageSquare className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{unreadMessages}</p>
-              <p className="text-sm text-muted-foreground">Сообщений</p>
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/courses">
+          <Card className="cursor-pointer transition-shadow hover:shadow-md">
+            <CardContent className="flex items-center gap-4 pt-6">
+              <div className="rounded-full bg-blue-100 p-3">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{enrollments.length}</p>
+                <p className="text-sm text-muted-foreground">Курсов</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/profile">
+          <Card className="cursor-pointer transition-shadow hover:shadow-md">
+            <CardContent className="flex items-center gap-4 pt-6">
+              <div className="rounded-full bg-yellow-100 p-3">
+                <Award className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{certificates}</p>
+                <p className="text-sm text-muted-foreground">Сертификатов</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/messages">
+          <Card className="cursor-pointer transition-shadow hover:shadow-md">
+            <CardContent className="flex items-center gap-4 pt-6">
+              <div className="rounded-full bg-green-100 p-3">
+                <MessageSquare className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{unreadMessages}</p>
+                <p className="text-sm text-muted-foreground">Сообщений</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* My courses */}
@@ -145,13 +151,13 @@ export default async function DashboardPage() {
                   </div>
                   <div className="shrink-0">
                     {enrollment.completedAt ? (
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-                        Завершён
-                      </Badge>
+                      <Link href={`/courses/${enrollment.course.slug}/learn`}>
+                        <Badge className="cursor-pointer bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
+                          Завершён ✓
+                        </Badge>
+                      </Link>
                     ) : (
-                      <Link
-                        href={`/courses/${enrollment.course.slug}/learn`}
-                      >
+                      <Link href={`/courses/${enrollment.course.slug}/learn`}>
                         <Button size="sm">Продолжить</Button>
                       </Link>
                     )}

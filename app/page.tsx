@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/layout/navbar";
 import {
@@ -18,6 +17,7 @@ import {
   Zap,
   MessageSquare,
   Clock,
+  LayoutDashboard,
 } from "lucide-react";
 
 async function getPublishedCourses() {
@@ -34,8 +34,6 @@ async function getPublishedCourses() {
 
 export default async function HomePage() {
   const session = await auth();
-  if (session?.user) redirect("/dashboard");
-
   const courses = await getPublishedCourses();
 
   return (
@@ -79,12 +77,21 @@ export default async function HomePage() {
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href="/register">
-                  <Button size="lg" variant="outline" className="h-14 gap-2 rounded-2xl border-2 px-8 text-base font-semibold" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
-                    <Play className="h-4 w-4 fill-current" />
-                    Начать бесплатно
-                  </Button>
-                </Link>
+                {session?.user ? (
+                  <Link href={session.user.role === "ADMIN" ? "/admin" : session.user.role === "AUTHOR" ? "/author/courses" : "/dashboard"}>
+                    <Button size="lg" variant="outline" className="h-14 gap-2 rounded-2xl border-2 px-8 text-base font-semibold" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
+                      <LayoutDashboard className="h-4 w-4" />
+                      Мой кабинет
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/register">
+                    <Button size="lg" variant="outline" className="h-14 gap-2 rounded-2xl border-2 px-8 text-base font-semibold" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
+                      <Play className="h-4 w-4 fill-current" />
+                      Начать бесплатно
+                    </Button>
+                  </Link>
+                )}
               </div>
 
               {/* Mini stats */}

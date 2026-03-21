@@ -179,7 +179,11 @@ export function CourseEditor({
                 onValueChange={(v) => updateField("categoryId", v)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите категорию" />
+                  <SelectValue>
+                    {categories.find((c) => c.id === course.categoryId)?.name ?? (
+                      <span className="text-muted-foreground">Выберите категорию</span>
+                    )}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (
@@ -198,7 +202,11 @@ export function CourseEditor({
                 onValueChange={(v) => updateField("level", v)}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue>
+                    {({ BEGINNER: "Начинающий", INTERMEDIATE: "Средний", ADVANCED: "Продвинутый" } as Record<string, string>)[course.level] ?? (
+                      <span className="text-muted-foreground">Выберите уровень</span>
+                    )}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="BEGINNER">Начинающий</SelectItem>
