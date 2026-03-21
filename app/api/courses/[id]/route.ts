@@ -3,6 +3,27 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { notifyStudentsNewCourse } from "@/lib/max-bot";
 
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({}, { status: 401 });
+
+  const { id } = await params;
+  const course = await prisma.course.findUnique({
+    where: { id },
+    include: { webinar: true },
+  });
+  if (!course) return NextResponse.json({}, { status: 404 });
+
+  if (course.authorId !== session.user.id && session.user.role !== "ADMIN") {
+    return NextResponse.json({}, { status: 403 });
+  }
+
+  return NextResponse.json(course);
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

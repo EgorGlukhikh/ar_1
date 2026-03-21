@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, BookOpen, Users, BarChart2, Home, ArrowLeft } from "lucide-react";
+import { GraduationCap, BookOpen, Users, BarChart2, ArrowLeft } from "lucide-react";
+import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 
 const navItems = [
   { href: "/author/courses", label: "Мои курсы", icon: BookOpen },
@@ -16,13 +17,12 @@ export default async function AuthorLayout({
 }) {
   const session = await auth();
   if (!session) redirect("/login");
-  if (session.user.role !== "AUTHOR" && session.user.role !== "ADMIN") {
-    redirect("/dashboard");
-  }
+  if (session.user.role !== "AUTHOR" && session.user.role !== "ADMIN") redirect("/dashboard");
 
   return (
     <div className="flex min-h-screen">
-      <aside className="flex w-56 shrink-0 flex-col border-r bg-white">
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex w-56 shrink-0 flex-col border-r bg-white">
         <div className="flex h-16 items-center gap-2 border-b px-4">
           <div
             className="flex h-8 w-8 items-center justify-center rounded-lg"
@@ -47,7 +47,7 @@ export default async function AuthorLayout({
         <div className="border-t px-4 py-4">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 text-xs text-gray-400 hover:text-gray-700 transition-colors"
+            className="flex items-center gap-2 text-xs text-gray-400 transition-colors hover:text-gray-700"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             На сайт
@@ -55,8 +55,17 @@ export default async function AuthorLayout({
         </div>
       </aside>
 
-      <div className="flex-1 bg-gray-50">
-        <main className="p-8">{children}</main>
+      {/* Mobile sidebar */}
+      <MobileSidebar
+        title="Кабинет автора"
+        navItems={navItems}
+        dark={false}
+        backHref="/dashboard"
+        backLabel="На сайт"
+      />
+
+      <div className="flex-1 bg-gray-50 min-w-0">
+        <main className="p-4 pt-16 lg:p-8 lg:pt-8">{children}</main>
       </div>
     </div>
   );

@@ -11,7 +11,6 @@ import {
   BookOpen,
   Award,
   MessageSquare,
-  Clock,
   GraduationCap,
 } from "lucide-react";
 
