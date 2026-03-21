@@ -12,8 +12,6 @@ import {
   Settings,
   User,
   BarChart3,
-  Menu,
-  X,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -142,13 +140,13 @@ export function Navbar() {
 
                     {/* Sign out */}
                     <div className="border-t py-1">
-                      <a
-                        href="/api/auth/signout"
-                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      <button
+                        onClick={() => { window.location.href = "/api/auth/signout"; }}
+                        className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <LogOut className="h-4 w-4" />
                         Выйти
-                      </a>
+                      </button>
                     </div>
                   </div>
                 )}

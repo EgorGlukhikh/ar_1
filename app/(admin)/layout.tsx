@@ -9,6 +9,7 @@ import {
   CreditCard,
   ArrowLeft,
 } from "lucide-react";
+import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 
 const navItems = [
   { href: "/admin", label: "Дашборд", icon: LayoutDashboard },
@@ -23,13 +24,12 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  if (!session || session.user.role !== "ADMIN") {
-    redirect("/dashboard");
-  }
+  if (!session || session.user.role !== "ADMIN") redirect("/dashboard");
 
   return (
     <div className="flex min-h-screen">
-      <aside className="flex w-56 shrink-0 flex-col bg-slate-900 text-white">
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-slate-900 text-white">
         <div className="flex h-16 items-center gap-2 border-b border-slate-700 px-4">
           <div
             className="flex h-8 w-8 items-center justify-center rounded-lg"
@@ -61,8 +61,18 @@ export default async function AdminLayout({
           </Link>
         </div>
       </aside>
-      <div className="flex-1 bg-gray-50">
-        <main className="p-8">{children}</main>
+
+      {/* Mobile sidebar */}
+      <MobileSidebar
+        title="Администратор"
+        navItems={navItems}
+        dark={true}
+        backHref="/dashboard"
+        backLabel="На сайт"
+      />
+
+      <div className="flex-1 bg-gray-50 min-w-0">
+        <main className="p-4 pt-16 lg:p-8 lg:pt-8">{children}</main>
       </div>
     </div>
   );

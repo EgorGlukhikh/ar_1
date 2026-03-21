@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { GraduationCap, Users, Clock, Search } from "lucide-react";
+import { GraduationCap, Users, Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 async function getCourses(query?: string, category?: string) {
