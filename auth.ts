@@ -8,6 +8,7 @@ import { Role } from "@prisma/client";
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: PrismaAdapter(prisma) as any,
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
