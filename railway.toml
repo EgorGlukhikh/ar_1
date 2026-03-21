@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "npx prisma migrate deploy && npx next start -p ${PORT:-3000}"
+startCommand = "npx prisma migrate deploy && npx prisma db seed && npx next start -p ${PORT:-3000}"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
