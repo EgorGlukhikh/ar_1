@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nvm list:*)",
+      "Bash(nvm use:*)",
+      "Bash(export PATH=\"/c/nvm4w/nodejs:$PATH\")"
+    ]
+  }
+}
