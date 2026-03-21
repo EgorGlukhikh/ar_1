@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendSubmissionReviewed } from "@/lib/email";
-import { notifyStudentSubmissionReviewed } from "@/lib/telegram";
+import { notifyStudentSubmissionReviewed } from "@/lib/max-bot";
 
 export async function POST(
   req: NextRequest,
@@ -63,7 +63,7 @@ export async function POST(
       : Promise.resolve(),
     submission.student.telegramId
       ? notifyStudentSubmissionReviewed({
-          telegramId: submission.student.telegramId,
+          maxId: submission.student.telegramId,
           studentName,
           lessonTitle,
           status: reviewStatus,
