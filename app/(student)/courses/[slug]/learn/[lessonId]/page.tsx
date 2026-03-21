@@ -51,8 +51,10 @@ export default async function LessonPage({ params }: PageProps) {
 
   if (!lesson) notFound();
 
-  // Check access: either enrolled or lesson is preview
-  if (!enrollment && !lesson.isPreview) {
+  // Check access: enrolled, preview lesson, or admin/author bypass
+  const isPrivileged =
+    session.user.role === "ADMIN" || session.user.role === "AUTHOR";
+  if (!enrollment && !lesson.isPreview && !isPrivileged) {
     redirect(`/courses/${slug}`);
   }
 

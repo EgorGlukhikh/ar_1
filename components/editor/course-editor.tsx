@@ -285,7 +285,12 @@ function CoverImageUpload({
       onChange(data.url);
       toast.success("Обложка загружена");
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Ошибка загрузки");
+      const msg = err instanceof Error ? err.message : "Ошибка загрузки";
+      if (msg.includes("S3")) {
+        toast.error("Загрузка файлов не настроена. Вставьте URL обложки вручную.");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setUploading(false);
     }

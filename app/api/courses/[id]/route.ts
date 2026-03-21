@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { notifyStudentsNewCourse } from "@/lib/max-bot";
 
 export async function PATCH(
   req: NextRequest,
@@ -18,7 +19,27 @@ export async function PATCH(
   }
 
   const data = await req.json();
+  const wasPublished = course.isPublished;
   const updated = await prisma.course.update({ where: { id }, data });
+
+  // Notify all users with MAX Bot connected when course is first published
+  if (!wasPublished && updated.isPublished) {
+    const usersWithMax = await prisma.user.findMany({
+      where: { telegramId: { not: null } },
+      select: { telegramId: true },
+    });
+    const maxIds = usersWithMax
+      .map((u) => u.telegramId!)
+      .filter(Boolean);
+    if (maxIds.length > 0) {
+      notifyStudentsNewCourse({
+        maxIds,
+        courseName: updated.title,
+        courseSlug: updated.slug,
+      }).catch(() => {});
+    }
+  }
+
   return NextResponse.json(updated);
 }
 

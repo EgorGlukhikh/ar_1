@@ -124,6 +124,70 @@ export async function notifyStudentCertificateIssued({
   await sendMaxMessage({ user_id: Number(maxId) }, { text });
 }
 
+/** Уведомить студентов о запуске нового курса */
+export async function notifyStudentsNewCourse({
+  maxIds,
+  courseName,
+  courseSlug,
+}: {
+  maxIds: string[];
+  courseName: string;
+  courseSlug: string;
+}) {
+  const appUrl = process.env.NEXTAUTH_URL ?? "https://академияриэлторов.рф";
+  const text =
+    `🚀 Новый курс!\n\n` +
+    `«${courseName}» — уже доступен на платформе.\n\n` +
+    `Записаться: ${appUrl}/courses/${courseSlug}`;
+
+  await Promise.all(
+    maxIds.map((id) => sendMaxMessage({ user_id: Number(id) }, { text }))
+  );
+}
+
+/** Напомнить студенту о незаконченном курсе (нет активности 3+ дней) */
+export async function notifyStudentInactiveReminder({
+  maxId,
+  studentName,
+  courseName,
+  courseSlug,
+}: {
+  maxId: string;
+  studentName: string;
+  courseName: string;
+  courseSlug: string;
+}) {
+  const appUrl = process.env.NEXTAUTH_URL ?? "https://академияриэлторов.рф";
+  const text =
+    `⏰ Вы давно не заходили!\n\n` +
+    `Привет, ${studentName}!\n` +
+    `Курс «${courseName}» ждёт вас.\n` +
+    `Продолжите обучение, пока знания ещё свежи.\n\n` +
+    `Продолжить: ${appUrl}/courses/${courseSlug}/learn`;
+
+  await sendMaxMessage({ user_id: Number(maxId) }, { text });
+}
+
+/** Поздравить студента с завершением курса */
+export async function notifyStudentCourseCompleted({
+  maxId,
+  studentName,
+  courseName,
+}: {
+  maxId: string;
+  studentName: string;
+  courseName: string;
+}) {
+  const appUrl = process.env.NEXTAUTH_URL ?? "https://академияриэлторов.рф";
+  const text =
+    `🏆 Курс завершён!\n\n` +
+    `Поздравляем, ${studentName}!\n` +
+    `Вы прошли курс «${courseName}» — это большое достижение!\n\n` +
+    `Сертификат уже ждёт вас в профиле:\n${appUrl}/profile`;
+
+  await sendMaxMessage({ user_id: Number(maxId) }, { text });
+}
+
 /** Напомнить студенту о предстоящем вебинаре */
 export async function notifyStudentWebinarSoon({
   maxId,

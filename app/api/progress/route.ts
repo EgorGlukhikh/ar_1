@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendCertificateIssued } from "@/lib/email";
-import { notifyStudentCertificateIssued } from "@/lib/max-bot";
+import { notifyStudentCertificateIssued, notifyStudentCourseCompleted } from "@/lib/max-bot";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -77,6 +77,13 @@ export async function POST(req: NextRequest) {
                 studentName: user.name ?? "Студент",
                 courseName: course.title,
                 certificateId: certificate.id,
+              })
+            : Promise.resolve(),
+          user.telegramId
+            ? notifyStudentCourseCompleted({
+                maxId: user.telegramId,
+                studentName: user.name ?? "Студент",
+                courseName: course.title,
               })
             : Promise.resolve(),
           user.telegramId
