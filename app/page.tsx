@@ -41,7 +41,7 @@ export default async function HomePage() {
       <Navbar />
 
       {/* ══════════ HERO ══════════ */}
-      <section className="relative overflow-hidden px-6 pb-0 pt-16 lg:px-10">
+      <section className="relative overflow-hidden px-4 pb-0 pt-12 sm:px-6 lg:px-10">
         {/* Bg blobs */}
         <div className="pointer-events-none absolute -right-32 -top-32 h-[500px] w-[500px] rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, #7C5CFC, #C084FC)" }} />
         <div className="pointer-events-none absolute -bottom-20 -left-20 h-[400px] w-[400px] rounded-full opacity-15 blur-3xl" style={{ background: "radial-gradient(circle, #F97316, #FCD34D)" }} />
@@ -56,7 +56,7 @@ export default async function HomePage() {
                 🏆 Платформа №1 для риэлторов России
               </div>
 
-              <h1 className="mb-6 text-5xl font-extrabold leading-[1.05] tracking-tight text-gray-900 lg:text-6xl">
+              <h1 className="mb-6 text-3xl font-extrabold leading-[1.05] tracking-tight text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl">
                 Прокачай карьеру{" "}
                 <span className="relative">
                   <span style={{ background: "linear-gradient(135deg, #7C5CFC 0%, #F97316 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
@@ -70,23 +70,23 @@ export default async function HomePage() {
                 Видеокурсы, тесты, живые вебинары и домашние задания с проверкой куратором. Учись в своём темпе — получи сертификат.
               </p>
 
-              <div className="flex flex-wrap gap-3">
-                <Link href="/courses">
-                  <Button size="lg" className="h-14 gap-2 rounded-2xl px-8 text-base font-semibold text-white shadow-lg" style={{ background: "linear-gradient(135deg, #7C5CFC, #9B5CF6)", boxShadow: "0 8px 30px rgba(124,92,252,0.4)" }}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Link href="/courses" className="w-full sm:w-auto">
+                  <Button size="lg" className="h-12 w-full gap-2 rounded-2xl px-6 text-base font-semibold text-white shadow-lg sm:h-14 sm:w-auto sm:px-8" style={{ background: "linear-gradient(135deg, #7C5CFC, #9B5CF6)", boxShadow: "0 8px 30px rgba(124,92,252,0.4)" }}>
                     Выбрать курс
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
                 {session?.user ? (
-                  <Link href={session.user.role === "ADMIN" ? "/admin" : session.user.role === "AUTHOR" ? "/author/courses" : "/dashboard"}>
-                    <Button size="lg" variant="outline" className="h-14 gap-2 rounded-2xl border-2 px-8 text-base font-semibold" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
+                  <Link href={session.user.role === "ADMIN" ? "/admin" : session.user.role === "AUTHOR" ? "/author/courses" : "/dashboard"} className="w-full sm:w-auto">
+                    <Button size="lg" variant="outline" className="h-12 w-full gap-2 rounded-2xl border-2 px-6 text-base font-semibold sm:h-14 sm:w-auto sm:px-8" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
                       <LayoutDashboard className="h-4 w-4" />
                       Мой кабинет
                     </Button>
                   </Link>
                 ) : (
-                  <Link href="/register">
-                    <Button size="lg" variant="outline" className="h-14 gap-2 rounded-2xl border-2 px-8 text-base font-semibold" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
+                  <Link href="/register" className="w-full sm:w-auto">
+                    <Button size="lg" variant="outline" className="h-12 w-full gap-2 rounded-2xl border-2 px-6 text-base font-semibold sm:h-14 sm:w-auto sm:px-8" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
                       <Play className="h-4 w-4 fill-current" />
                       Начать бесплатно
                     </Button>
@@ -174,7 +174,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="mb-14 text-center">
             <p className="mb-3 text-sm font-semibold uppercase tracking-widest" style={{ color: "#7C5CFC" }}>Почему мы</p>
-            <h2 className="text-4xl font-extrabold text-gray-900">Всё для роста в одном месте</h2>
+            <h2 className="text-2xl font-extrabold text-gray-900 sm:text-3xl md:text-4xl">Всё для роста в одном месте</h2>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -202,7 +202,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-5xl px-6 lg:px-10">
           <div className="mb-14 text-center">
             <p className="mb-3 text-sm font-semibold uppercase tracking-widest" style={{ color: "#7C5CFC" }}>Простой старт</p>
-            <h2 className="text-4xl font-extrabold text-gray-900">Три шага до результата</h2>
+            <h2 className="text-2xl font-extrabold text-gray-900 sm:text-3xl md:text-4xl">Три шага до результата</h2>
           </div>
 
           <div className="relative grid gap-8 sm:grid-cols-3">
@@ -234,7 +234,7 @@ export default async function HomePage() {
             <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="mb-2 text-sm font-semibold uppercase tracking-widest" style={{ color: "#7C5CFC" }}>Каталог</p>
-                <h2 className="text-4xl font-extrabold text-gray-900">Популярные курсы</h2>
+                <h2 className="text-2xl font-extrabold text-gray-900 sm:text-3xl md:text-4xl">Популярные курсы</h2>
               </div>
               <Link href="/courses" className="flex items-center gap-1 font-medium transition-colors hover:opacity-70" style={{ color: "#7C5CFC" }}>
                 Все курсы <ArrowRight className="h-4 w-4" />
@@ -283,7 +283,7 @@ export default async function HomePage() {
       <section className="py-20" style={{ background: "#F5F4FF" }}>
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <div className="overflow-hidden rounded-3xl" style={{ background: "linear-gradient(135deg, #7C5CFC 0%, #9B5CF6 50%, #F97316 100%)" }}>
-            <div className="grid items-center gap-8 p-10 lg:grid-cols-2 lg:p-14">
+            <div className="grid items-center gap-8 p-6 sm:p-10 lg:grid-cols-2 lg:p-14">
               <div className="text-white">
                 <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-white/70">Для преподавателей</p>
                 <h2 className="mb-4 text-3xl font-extrabold lg:text-4xl">Стань автором курса</h2>
@@ -331,24 +331,24 @@ export default async function HomePage() {
             <Star className="h-4 w-4 fill-current" />
             Начни прямо сейчас — это бесплатно
           </div>
-          <h2 className="mb-4 text-4xl font-extrabold text-gray-900 lg:text-5xl">
+          <h2 className="mb-4 text-2xl font-extrabold text-gray-900 sm:text-3xl md:text-4xl lg:text-5xl">
             Готов вырасти как{" "}
             <span style={{ background: "linear-gradient(135deg, #7C5CFC, #F97316)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               профессионал?
             </span>
           </h2>
-          <p className="mb-10 text-lg text-gray-500">
+          <p className="mb-10 text-base text-gray-500 sm:text-lg">
             Присоединяйся к сотням риэлторов, которые уже учатся и зарабатывают больше.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/register">
-              <Button size="lg" className="h-14 gap-2 rounded-2xl px-10 text-base font-bold text-white shadow-xl" style={{ background: "linear-gradient(135deg, #7C5CFC, #9B5CF6)", boxShadow: "0 8px 30px rgba(124,92,252,0.4)" }}>
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link href="/register" className="w-full sm:w-auto">
+              <Button size="lg" className="h-12 w-full gap-2 rounded-2xl px-8 text-base font-bold text-white shadow-xl sm:h-14 sm:w-auto" style={{ background: "linear-gradient(135deg, #7C5CFC, #9B5CF6)", boxShadow: "0 8px 30px rgba(124,92,252,0.4)" }}>
                 Зарегистрироваться бесплатно
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/courses">
-              <Button size="lg" variant="outline" className="h-14 rounded-2xl border-2 px-10 text-base font-bold" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
+            <Link href="/courses" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="h-12 w-full rounded-2xl border-2 px-8 text-base font-bold sm:h-14 sm:w-auto" style={{ borderColor: "#7C5CFC", color: "#7C5CFC" }}>
                 Смотреть курсы
               </Button>
             </Link>
