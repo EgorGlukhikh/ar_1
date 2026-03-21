@@ -27,10 +27,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
 
-  const { title } = await req.json();
+  const { title, type } = await req.json();
   if (!title) {
     return NextResponse.json({ message: "title required" }, { status: 400 });
   }
+
+  const courseType = type === "WEBINAR" ? "WEBINAR" : "COURSE";
 
   let slug = slugify(title);
   // Ensure unique slug
@@ -38,7 +40,7 @@ export async function POST(req: NextRequest) {
   if (existing) slug = `${slug}-${Date.now()}`;
 
   const course = await prisma.course.create({
-    data: { title, slug, authorId: session.user.id },
+    data: { title, slug, authorId: session.user.id, type: courseType },
   });
 
   return NextResponse.json(course, { status: 201 });

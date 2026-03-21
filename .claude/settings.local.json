@@ -5,7 +5,32 @@
       "Bash(nvm use:*)",
       "Bash(export PATH=\"/c/nvm4w/nodejs:$PATH\")",
       "Bash(grep -rn asChild /d/AR/components /d/AR/app --include=*.tsx)",
-      "WebFetch(domain:xn--80aafbl3afrjf.xn--p1ai)"
+      "WebFetch(domain:xn--80aafbl3afrjf.xn--p1ai)",
+      "Bash(find \"D:/AR/app/\\(student\\)\" -name \"*.tsx\")",
+      "Bash(curl -s \"https://botapi.max.ru/me?access_token=f9LHodD0cOKdwbWh29LJz-n1mZHALOcg5aOUw_4A7UIuW99mDRFlhm6K1ZED_nSu8xD0kB6j6rKQC7gn3-3U\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s https://botapi.max.ru/me?access_token=f9LHodD0cOKdwbWh29LJz-n1mZHALOcg5aOUw_4A7UIuW99mDRFlhm6K1ZED_nSu8xD0kB6j6rKQC7gn3-3U)",
+      "Bash(curl -s \"https://botapi.max.ru/subscriptions?access_token=f9LHodD0cOKdwbWh29LJz-n1mZHALOcg5aOUw_4A7UIuW99mDRFlhm6K1ZED_nSu8xD0kB6j6rKQC7gn3-3U\")",
+      "Bash(curl -s -X POST \"https://botapi.max.ru/subscriptions?access_token=f9LHodD0cOKdwbWh29LJz-n1mZHALOcg5aOUw_4A7UIuW99mDRFlhm6K1ZED_nSu8xD0kB6j6rKQC7gn3-3U\" -H \"Content-Type: application/json\" -d '{\"\"url\"\":\"\"https://ar1-production.up.railway.app/api/webhooks/max-bot\"\"}')",
+      "Bash(cat \"D:/AR/app/\\(public\\)/layout.tsx\")",
+      "Bash(gh issue:*)",
+      "Bash(gh pr:*)",
+      "Bash(cat \"D:/AR/app/\\(public\\)/page.tsx\")",
+      "Bash(find /c/Users/Egor -name claude* -type f)",
+      "Bash(find D:/AR/components -name video-player* -o -name VideoPlayer*)",
+      "Bash(find D:/AR/lib -name s3* -o -name upload*)",
+      "WebSearch",
+      "WebFetch(domain:www.launchfa.st)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:dev.max.ru)",
+      "WebFetch(domain:habr.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:dev.tamtam.chat)",
+      "Bash(git add:*)",
+      "Bash(find \"D:\\\\AR/app\" -type d -name \"\\\\\\\\\\(student\\\\\\\\\\)\")",
+      "Bash(ls \"D:/AR/app/\\(student\\)/courses/[slug]/learn/\")",
+      "Bash(node -e \":*)",
+      "Bash(gh run:*)"
     ]
   }
 }

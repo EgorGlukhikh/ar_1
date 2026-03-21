@@ -50,6 +50,7 @@ model User {
   sentMessages   Message[]        @relation("SentMessages")
   receivedMessages Message[]      @relation("ReceivedMessages")
   payments       Payment[]
+  webinarAttendances WebinarAttendance[]
 }
 
 model Account {
@@ -97,6 +98,11 @@ enum CourseLevel {
   ADVANCED
 }
 
+enum CourseType {
+  COURSE
+  WEBINAR
+}
+
 model Category {
   id      String   @id @default(cuid())
   name    String   @unique
@@ -117,6 +123,7 @@ model Course {
   authorId    String
   categoryId  String?
 
+  type        CourseType  @default(COURSE)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -126,6 +133,7 @@ model Course {
   enrollments Enrollment[]
   certificates Certificate[]
   payments    Payment[]
+  webinar     CourseWebinar?
 }
 
 model Module {
@@ -149,7 +157,6 @@ enum LessonType {
   TEXT
   QUIZ
   ASSIGNMENT
-  WEBINAR
 }
 
 enum VideoType {
@@ -181,7 +188,6 @@ model Lesson {
   progress    LessonProgress[]
   quiz        Quiz?
   assignment  Assignment?
-  webinar     Webinar?
   attachments Attachment[]
 }
 
@@ -303,16 +309,31 @@ enum WebinarStatus {
   ENDED
 }
 
-model Webinar {
+model CourseWebinar {
   id           String        @id @default(cuid())
-  lessonId     String        @unique
+  courseId     String        @unique
   scheduledAt  DateTime
-  roomId       String?       // VideoSDK / 100ms room id
-  streamKey    String?
-  recordingUrl String?
+  duration     Int?          // минут (примерная длительность)
+  joinUrl      String?       // ссылка для входа (Zoom, VideoSDK, и т.д.)
+  recordingUrl String?       // ссылка на запись после эфира
   status       WebinarStatus @default(SCHEDULED)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
-  lesson       Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  course       Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  attendances  WebinarAttendance[]
+}
+
+model WebinarAttendance {
+  id        String        @id @default(cuid())
+  webinarId String
+  userId    String
+  joinedAt  DateTime      @default(now())
+
+  webinar   CourseWebinar @relation(fields: [webinarId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([webinarId, userId])
 }
 
 // ──────────────────────────────────────────────
