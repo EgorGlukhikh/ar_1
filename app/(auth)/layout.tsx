@@ -19,7 +19,7 @@ export default function AuthLayout({
             <GraduationCap className="h-8 w-8 text-white" />
             <span className="text-lg font-bold text-white leading-tight">
               Академия<br />
-              <span className="font-normal text-white/80 text-sm">Союз риэлторов</span>
+              <span className="font-normal text-white/80 text-sm">Риэлторов</span>
             </span>
           </div>
           {/* Colored logo for mobile */}
@@ -27,7 +27,7 @@ export default function AuthLayout({
             <GraduationCap className="h-8 w-8 text-[#6E8AFA]" />
             <span className="text-lg font-bold text-gray-900 leading-tight">
               Академия<br />
-              <span className="font-normal text-gray-500 text-sm">Союз риэлторов</span>
+              <span className="font-normal text-gray-500 text-sm">Риэлторов</span>
             </span>
           </div>
         </Link>
