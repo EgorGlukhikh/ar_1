@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { sendCertificateIssued } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
   const progress =
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
-  const enrollment = await prisma.enrollment.update({
+  await prisma.enrollment.update({
     where: { userId_courseId: { userId: session.user.id, courseId } },
     data: {
       progress,
@@ -49,13 +50,32 @@ export async function POST(req: NextRequest) {
 
     if (!existing) {
       const certNumber = `AR-${Date.now()}-${session.user.id.slice(-4).toUpperCase()}`;
-      await prisma.certificate.create({
-        data: {
-          userId: session.user.id,
-          courseId,
-          number: certNumber,
-        },
-      });
+      const [certificate, user, course] = await Promise.all([
+        prisma.certificate.create({
+          data: {
+            userId: session.user.id,
+            courseId,
+            number: certNumber,
+          },
+        }),
+        prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: { name: true, email: true },
+        }),
+        prisma.course.findUnique({
+          where: { id: courseId },
+          select: { title: true },
+        }),
+      ]);
+
+      if (user?.email && course) {
+        await sendCertificateIssued({
+          to: user.email,
+          studentName: user.name ?? "Студент",
+          courseName: course.title,
+          certificateId: certificate.id,
+        });
+      }
     }
   }
 

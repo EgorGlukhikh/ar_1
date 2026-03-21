@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { sendSubmissionReviewed } from "@/lib/email";
 
 export async function POST(
   req: NextRequest,
@@ -24,8 +25,35 @@ export async function POST(
       score,
       reviewerId: session.user.id,
     },
-    include: { student: true },
+    include: {
+      student: { select: { name: true, email: true } },
+      assignment: {
+        include: {
+          lesson: {
+            include: {
+              module: {
+                include: { course: { select: { title: true } } },
+              },
+            },
+          },
+        },
+      },
+    },
   });
+
+  // Send email notification to student
+  if (submission.student.email) {
+    await sendSubmissionReviewed({
+      to: submission.student.email,
+      studentName: submission.student.name ?? "Студент",
+      courseName: submission.assignment.lesson.module.course.title,
+      lessonTitle: submission.assignment.lesson.title,
+      status: status as "APPROVED" | "REJECTED" | "REVISION",
+      feedback,
+      score,
+      maxScore: submission.assignment.maxScore,
+    });
+  }
 
   return NextResponse.json(submission);
 }

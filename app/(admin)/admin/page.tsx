@@ -160,6 +160,25 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* Admin nav shortcuts */}
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Link href="/admin/users">
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Users className="h-4 w-4" /> Пользователи
+          </Button>
+        </Link>
+        <Link href="/admin/courses">
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <BookOpen className="h-4 w-4" /> Все курсы
+          </Button>
+        </Link>
+        <Link href="/admin/payments">
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <CreditCard className="h-4 w-4" /> Платежи
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

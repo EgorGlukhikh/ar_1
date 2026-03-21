@@ -5,6 +5,8 @@ import { VideoPlayer } from "@/components/video-player/video-player";
 import { LessonSidebar } from "@/components/learn/lesson-sidebar";
 import { LessonContent } from "@/components/learn/lesson-content";
 import { CompleteButton } from "@/components/learn/complete-button";
+import { QuizBlock } from "@/components/learn/quiz-block";
+import { AssignmentBlock } from "@/components/learn/assignment-block";
 
 interface PageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -132,6 +134,30 @@ export default async function LessonPage({ params }: PageProps) {
                   </a>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Quiz */}
+          {lesson.type === "QUIZ" && lesson.quiz && enrollment && (
+            <div className="mt-6">
+              <QuizBlock
+                quiz={lesson.quiz}
+                onPassed={() => {
+                  // CompleteButton will handle marking complete
+                }}
+              />
+            </div>
+          )}
+
+          {/* Assignment */}
+          {lesson.type === "ASSIGNMENT" && lesson.assignment && enrollment && (
+            <div className="mt-6">
+              <AssignmentBlock
+                assignment={lesson.assignment}
+                onApproved={() => {
+                  // auto-mark complete when approved
+                }}
+              />
             </div>
           )}
         </div>
