@@ -4,7 +4,8 @@
       "Bash(nvm list:*)",
       "Bash(nvm use:*)",
       "Bash(export PATH=\"/c/nvm4w/nodejs:$PATH\")",
-      "Bash(grep -rn asChild /d/AR/components /d/AR/app --include=*.tsx)"
+      "Bash(grep -rn asChild /d/AR/components /d/AR/app --include=*.tsx)",
+      "WebFetch(domain:xn--80aafbl3afrjf.xn--p1ai)"
     ]
   }
 }

@@ -9,11 +9,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Введите корректный email"),
@@ -56,67 +52,106 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-lg">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Вход в аккаунт</CardTitle>
-        <CardDescription>
-          Введите ваши данные для входа в Академию
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              {...register("email")}
-            />
+    <div className="w-full max-w-[288px] xs:max-w-[432px] md:max-w-[512px] lg:max-w-[410px] xl:max-w-[416px] 2xl:max-w-[528px]">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-y-8 md:gap-y-10 lg:gap-y-12"
+      >
+        <h1 className="font-semibold text-gray-900 leading-tight text-2xl xs:text-[32px] xs:leading-[42px] lg:text-[40px] lg:leading-[52px] text-center xl:text-start">
+          Вход в обучающую{" "}
+          <br className="hidden xs:block" />
+          платформу
+        </h1>
+
+        <div className="flex flex-col gap-y-5">
+          {/* Email input */}
+          <div className="flex flex-col gap-y-1">
+            <div className="relative rounded-lg border border-gray-200 bg-gray-50 transition-all duration-200 focus-within:border-[#6E8AFA] focus-within:bg-white">
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                className="w-full bg-transparent rounded-lg outline-none pt-6 pb-1.5 px-4 text-gray-900 text-sm peer"
+                placeholder=" "
+                {...register("email")}
+              />
+              <label
+                htmlFor="email"
+                className="absolute left-4 top-4 text-sm text-gray-400 pointer-events-none transition-all duration-200 peer-placeholder-shown:top-4 peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-[#6E8AFA]"
+              >
+                Email
+              </label>
+            </div>
             {errors.email && (
-              <p className="text-xs text-red-500">{errors.email.message}</p>
+              <p className="text-xs text-red-500 px-1">{errors.email.message}</p>
             )}
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="password">Пароль</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              {...register("password")}
-            />
+          {/* Password input */}
+          <div className="flex flex-col gap-y-1">
+            <div className="relative rounded-lg border border-gray-200 bg-gray-50 transition-all duration-200 focus-within:border-[#6E8AFA] focus-within:bg-white">
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                className="w-full bg-transparent rounded-lg outline-none pt-6 pb-1.5 px-4 text-gray-900 text-sm peer"
+                placeholder=" "
+                {...register("password")}
+              />
+              <label
+                htmlFor="password"
+                className="absolute left-4 top-4 text-sm text-gray-400 pointer-events-none transition-all duration-200 peer-placeholder-shown:top-4 peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-[#6E8AFA]"
+              >
+                Пароль
+              </label>
+            </div>
             {errors.password && (
-              <p className="text-xs text-red-500">{errors.password.message}</p>
+              <p className="text-xs text-red-500 px-1">{errors.password.message}</p>
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          {/* Submit button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center justify-center gap-3 h-14 rounded-lg bg-[#6E8AFA] text-white text-lg font-normal px-8 w-full transition-all duration-300 hover:bg-[#5A78F0] active:bg-[#4A68E0] disabled:opacity-60 disabled:pointer-events-none mt-2"
+          >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
                 Входим...
               </>
             ) : (
-              "Войти"
+              <>
+                <p>Войти</p>
+                <ArrowRight className="h-5 w-5" />
+              </>
             )}
-          </Button>
-        </form>
+          </button>
 
-        <div className="mt-4 text-center text-sm text-muted-foreground">
-          Нет аккаунта?{" "}
-          <Link href="/register" className="font-medium text-primary hover:underline">
-            Зарегистрироваться
-          </Link>
+          {/* Register link */}
+          <div className="text-center text-sm text-gray-500">
+            Нет аккаунта?{" "}
+            <Link
+              href="/register"
+              className="font-medium text-[#6E8AFA] hover:underline"
+            >
+              Зарегистрироваться
+            </Link>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </form>
+    </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="h-96 w-full max-w-md animate-pulse rounded-lg bg-gray-100" />}>
+    <Suspense
+      fallback={
+        <div className="h-96 w-full max-w-md animate-pulse rounded-lg bg-gray-100" />
+      }
+    >
       <LoginForm />
     </Suspense>
   );
