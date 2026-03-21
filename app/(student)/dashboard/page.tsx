@@ -124,44 +124,34 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-4">
               {enrollments.map((enrollment) => (
-                <div
+                <Link
                   key={enrollment.id}
-                  className="flex items-center gap-4 rounded-lg border p-4"
+                  href={`/courses/${enrollment.course.slug}/learn`}
+                  className="flex flex-col gap-2 rounded-lg border p-4 transition-colors hover:bg-gray-50 sm:flex-row sm:items-center sm:gap-4"
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-100">
-                    <BookOpen className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="truncate font-medium">
-                      {enrollment.course.title}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {enrollment.course.author.name}
-                    </p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <Progress
-                        value={enrollment.progress}
-                        className="h-1.5 flex-1"
-                      />
-                      <span className="text-xs text-muted-foreground">
-                        {enrollment.progress}%
-                      </span>
+                  <div className="flex items-center gap-3 sm:contents">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 sm:h-12 sm:w-12">
+                      <BookOpen className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate font-medium">{enrollment.course.title}</p>
+                      <p className="text-sm text-muted-foreground">{enrollment.course.author.name}</p>
+                      <div className="mt-1.5 flex items-center gap-2">
+                        <Progress value={enrollment.progress} className="h-1.5 flex-1" />
+                        <span className="text-xs text-muted-foreground">{enrollment.progress}%</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="shrink-0">
+                  <div className="shrink-0 sm:ml-auto">
                     {enrollment.completedAt ? (
-                      <Link href={`/courses/${enrollment.course.slug}/learn`}>
-                        <Badge className="cursor-pointer bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
-                          Завершён ✓
-                        </Badge>
-                      </Link>
+                      <Badge className="bg-green-100 text-green-700">Завершён ✓</Badge>
                     ) : (
-                      <Link href={`/courses/${enrollment.course.slug}/learn`}>
-                        <Button size="sm">Продолжить</Button>
-                      </Link>
+                      <Button size="sm" className="w-full sm:w-auto" asChild>
+                        <span>Продолжить</span>
+                      </Button>
                     )}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

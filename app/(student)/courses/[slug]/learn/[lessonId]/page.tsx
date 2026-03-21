@@ -88,7 +88,7 @@ export default async function LessonPage({ params }: PageProps) {
 
       {/* Main */}
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-4xl p-6">
+        <div className="mx-auto max-w-4xl p-4 pb-28 lg:p-6 lg:pb-6">
           {/* Video */}
           {lesson.type === "VIDEO" && (lesson.videoType || lesson.muxPlaybackId) && (
             <div className="mb-6">
@@ -101,8 +101,8 @@ export default async function LessonPage({ params }: PageProps) {
             </div>
           )}
 
-          <div className="flex items-start justify-between gap-4">
-            <h1 className="text-2xl font-bold">{lesson.title}</h1>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <h1 className="text-xl font-bold sm:text-2xl">{lesson.title}</h1>
             {enrollment && (
               <CompleteButton
                 lessonId={lessonId}
