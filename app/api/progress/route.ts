@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendCertificateIssued } from "@/lib/email";
+import { notifyStudentCertificateIssued } from "@/lib/telegram";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
         }),
         prisma.user.findUnique({
           where: { id: session.user.id },
-          select: { name: true, email: true },
+          select: { name: true, email: true, telegramId: true },
         }),
         prisma.course.findUnique({
           where: { id: courseId },
@@ -68,13 +69,25 @@ export async function POST(req: NextRequest) {
         }),
       ]);
 
-      if (user?.email && course) {
-        await sendCertificateIssued({
-          to: user.email,
-          studentName: user.name ?? "Студент",
-          courseName: course.title,
-          certificateId: certificate.id,
-        });
+      if (course && user) {
+        await Promise.all([
+          user.email
+            ? sendCertificateIssued({
+                to: user.email,
+                studentName: user.name ?? "Студент",
+                courseName: course.title,
+                certificateId: certificate.id,
+              })
+            : Promise.resolve(),
+          user.telegramId
+            ? notifyStudentCertificateIssued({
+                telegramId: user.telegramId,
+                studentName: user.name ?? "Студент",
+                courseName: course.title,
+                certificateId: certificate.id,
+              })
+            : Promise.resolve(),
+        ]);
       }
     }
   }

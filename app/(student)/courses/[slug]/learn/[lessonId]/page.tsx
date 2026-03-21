@@ -7,6 +7,7 @@ import { LessonContent } from "@/components/learn/lesson-content";
 import { CompleteButton } from "@/components/learn/complete-button";
 import { QuizBlock } from "@/components/learn/quiz-block";
 import { AssignmentBlock } from "@/components/learn/assignment-block";
+import { WebinarBlock } from "@/components/learn/webinar-block";
 
 interface PageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -158,6 +159,13 @@ export default async function LessonPage({ params }: PageProps) {
                   // auto-mark complete when approved
                 }}
               />
+            </div>
+          )}
+
+          {/* Webinar */}
+          {lesson.type === "WEBINAR" && enrollment && (
+            <div className="mt-6">
+              <WebinarBlock lessonId={lessonId} lessonTitle={lesson.title} />
             </div>
           )}
         </div>

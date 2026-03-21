@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendSubmissionReviewed } from "@/lib/email";
+import { notifyStudentSubmissionReviewed } from "@/lib/telegram";
 
 export async function POST(
   req: NextRequest,
@@ -26,7 +27,7 @@ export async function POST(
       reviewerId: session.user.id,
     },
     include: {
-      student: { select: { name: true, email: true } },
+      student: { select: { name: true, email: true, telegramId: true } },
       assignment: {
         include: {
           lesson: {
@@ -41,19 +42,37 @@ export async function POST(
     },
   });
 
-  // Send email notification to student
-  if (submission.student.email) {
-    await sendSubmissionReviewed({
-      to: submission.student.email,
-      studentName: submission.student.name ?? "Студент",
-      courseName: submission.assignment.lesson.module.course.title,
-      lessonTitle: submission.assignment.lesson.title,
-      status: status as "APPROVED" | "REJECTED" | "REVISION",
-      feedback,
-      score,
-      maxScore: submission.assignment.maxScore,
-    });
-  }
+  const studentName = submission.student.name ?? "Студент";
+  const courseName = submission.assignment.lesson.module.course.title;
+  const lessonTitle = submission.assignment.lesson.title;
+  const reviewStatus = status as "APPROVED" | "REJECTED" | "REVISION";
+
+  // Email + Telegram notifications in parallel
+  await Promise.all([
+    submission.student.email
+      ? sendSubmissionReviewed({
+          to: submission.student.email,
+          studentName,
+          courseName,
+          lessonTitle,
+          status: reviewStatus,
+          feedback,
+          score,
+          maxScore: submission.assignment.maxScore,
+        })
+      : Promise.resolve(),
+    submission.student.telegramId
+      ? notifyStudentSubmissionReviewed({
+          telegramId: submission.student.telegramId,
+          studentName,
+          lessonTitle,
+          status: reviewStatus,
+          score,
+          maxScore: submission.assignment.maxScore,
+          feedback,
+        })
+      : Promise.resolve(),
+  ]);
 
   return NextResponse.json(submission);
 }

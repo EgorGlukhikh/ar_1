@@ -18,6 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RichTextEditor } from "./rich-text-editor";
 import { VideoPlayer } from "@/components/video-player/video-player";
+import { WebinarSettings } from "./webinar-settings";
 import { ArrowLeft, Save, Loader2, Eye } from "lucide-react";
 import Link from "next/link";
 
@@ -198,13 +199,7 @@ export function LessonEditor({
             )}
 
             {lesson.type === "WEBINAR" && (
-              <div className="rounded-lg bg-purple-50 p-4 text-sm text-purple-700">
-                <p className="font-semibold">Вебинар</p>
-                <p className="mt-1">
-                  Настройка вебинара: укажите дату, время и подключите платформу
-                  (VideoSDK / 100ms). Запись будет доступна после эфира.
-                </p>
-              </div>
+              <WebinarSettings lessonId={lesson.id} />
             )}
           </div>
         </div>

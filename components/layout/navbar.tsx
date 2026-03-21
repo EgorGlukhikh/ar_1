@@ -20,6 +20,7 @@ import {
   LogOut,
   Settings,
   User,
+  BarChart3,
 } from "lucide-react";
 
 export function Navbar() {
@@ -97,6 +98,12 @@ export function Navbar() {
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Кабинет
                   </DropdownMenuItem>
+                  {(session.user.role === "AUTHOR" || session.user.role === "ADMIN") && (
+                    <DropdownMenuItem onClick={() => router.push("/author/analytics")}>
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      Аналитика
+                    </DropdownMenuItem>
+                  )}
                   {session.user.role === "ADMIN" && (
                     <DropdownMenuItem onClick={() => router.push("/admin")}>
                       <Settings className="mr-2 h-4 w-4" />
