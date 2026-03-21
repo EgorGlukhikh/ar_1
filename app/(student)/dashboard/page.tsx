@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { MaxBotBanner } from "@/components/onboarding/max-bot-banner";
 import {
   BookOpen,
   Award,
@@ -15,7 +16,7 @@ import {
 } from "lucide-react";
 
 async function getStudentData(userId: string) {
-  const [enrollments, certificates, unreadMessages] = await Promise.all([
+  const [enrollments, certificates, unreadMessages, user] = await Promise.all([
     prisma.enrollment.findMany({
       where: { userId },
       include: {
@@ -33,21 +34,23 @@ async function getStudentData(userId: string) {
     }),
     prisma.certificate.count({ where: { userId } }),
     prisma.message.count({ where: { receiverId: userId, isRead: false } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { telegramId: true } }),
   ]);
 
-  return { enrollments, certificates, unreadMessages };
+  return { enrollments, certificates, unreadMessages, maxConnected: !!user?.telegramId };
 }
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session) redirect("/login");
 
-  const { enrollments, certificates, unreadMessages } = await getStudentData(
-    session.user.id
-  );
+  const { enrollments, certificates, unreadMessages, maxConnected } =
+    await getStudentData(session.user.id);
 
   return (
     <div>
+      {!maxConnected && <MaxBotBanner />}
+
       <div className="mb-8">
         <h1 className="text-2xl font-bold">
           Привет, {session.user.name?.split(" ")[0] ?? "студент"} 👋
