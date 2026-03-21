@@ -1,40 +1,50 @@
 "use client";
 
-import { useState } from "react";
-import { Bell, ExternalLink, CheckCircle2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Bell, ExternalLink, CheckCircle2, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
-export function MaxBotBanner() {
-  const [step, setStep] = useState<"idle" | "enter-id" | "saving" | "done">(
-    "idle"
-  );
-  const [maxId, setMaxId] = useState("");
-  const [error, setError] = useState("");
+const BOT_URL = "https://max.ru/id1800004221_3_bot";
+
+export function MaxBotBanner({ userId }: { userId: string }) {
+  const [step, setStep] = useState<"idle" | "waiting" | "done">("idle");
   const [dismissed, setDismissed] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  if (dismissed) return null;
-
-  async function handleSave() {
-    if (!maxId.trim()) {
-      setError("Введите ваш MAX ID");
-      return;
-    }
-    setStep("saving");
-    setError("");
-    try {
-      const res = await fetch("/api/profile/max", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ maxId: maxId.trim() }),
-      });
-      if (!res.ok) throw new Error();
-      setStep("done");
-    } catch {
-      setError("Не удалось сохранить. Попробуйте ещё раз.");
-      setStep("enter-id");
+  function stopPolling() {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
     }
   }
+
+  function startPolling() {
+    stopPolling();
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch("/api/profile/max");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.maxId) {
+          stopPolling();
+          setStep("done");
+        }
+      } catch {
+        // ignore
+      }
+    }, 3000);
+  }
+
+  useEffect(() => () => stopPolling(), []);
+
+  function handleConnect() {
+    const deepLink = `${BOT_URL}?start=${encodeURIComponent(userId)}`;
+    window.open(deepLink, "_blank", "noopener,noreferrer");
+    setStep("waiting");
+    startPolling();
+  }
+
+  if (dismissed) return null;
 
   if (step === "done") {
     return (
@@ -50,7 +60,6 @@ export function MaxBotBanner() {
 
   return (
     <div className="relative mb-6 overflow-hidden rounded-xl border border-[#6E8AFA]/30 bg-gradient-to-r from-[#EEF1FF] to-white px-5 py-4">
-      {/* Dismiss */}
       <button
         onClick={() => setDismissed(true)}
         className="absolute right-3 top-3 rounded-md p-1 text-gray-400 hover:text-gray-600"
@@ -59,7 +68,6 @@ export function MaxBotBanner() {
       </button>
 
       <div className="flex items-start gap-4">
-        {/* Icon */}
         <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#6E8AFA]/15">
           <Bell className="h-5 w-5 text-[#6E8AFA]" />
         </div>
@@ -73,63 +81,39 @@ export function MaxBotBanner() {
             сертификатах.
           </p>
 
-          {step === "idle" && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <a
-                href="https://max.ru/id1800004221_3_bot"
-                target="_blank"
-                rel="noopener noreferrer"
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {step === "idle" && (
+              <Button
+                size="sm"
+                className="bg-[#6E8AFA] hover:bg-[#5a76f0]"
+                onClick={handleConnect}
               >
-                <Button
-                  size="sm"
-                  className="bg-[#6E8AFA] hover:bg-[#5a76f0]"
-                  onClick={() => setStep("enter-id")}
-                >
-                  Подключить бота Академии
-                  <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                </Button>
-              </a>
-            </div>
-          )}
+                Подключить бота
+                <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+              </Button>
+            )}
 
-          {(step === "enter-id" || step === "saving") && (
-            <div className="mt-3 space-y-2">
-              <p className="text-xs text-gray-500">
-                Откройте бота, напишите ему{" "}
-                <span className="font-mono font-medium text-gray-700">
-                  /start
-                </span>{" "}
-                — он ответит вашим MAX ID. Вставьте его ниже:
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Ваш MAX ID (например: 123456789)"
-                  value={maxId}
-                  onChange={(e) => setMaxId(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                  className="h-9 max-w-xs text-sm"
-                  disabled={step === "saving"}
-                />
-                <Button
-                  size="sm"
-                  className="bg-[#6E8AFA] hover:bg-[#5a76f0]"
-                  onClick={handleSave}
-                  disabled={step === "saving"}
-                >
-                  {step === "saving" ? "Сохраняю..." : "Сохранить"}
+            {step === "waiting" && (
+              <>
+                <Button size="sm" disabled className="bg-[#6E8AFA]">
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Ожидаю подключения…
                 </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setStep("idle")}
-                  disabled={step === "saving"}
+                <span className="text-xs text-gray-500">
+                  Откройте бота в MAX и нажмите «Начать»
+                </span>
+                <button
+                  onClick={() => {
+                    stopPolling();
+                    setStep("idle");
+                  }}
+                  className="text-xs text-gray-400 underline hover:text-gray-600"
                 >
                   Отмена
-                </Button>
-              </div>
-              {error && <p className="text-xs text-red-500">{error}</p>}
-            </div>
-          )}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

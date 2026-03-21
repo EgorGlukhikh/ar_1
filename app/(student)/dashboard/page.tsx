@@ -49,7 +49,7 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      {!maxConnected && <MaxBotBanner />}
+      {!maxConnected && <MaxBotBanner userId={session.user.id} />}
 
       <div className="mb-8">
         <h1 className="text-2xl font-bold">
