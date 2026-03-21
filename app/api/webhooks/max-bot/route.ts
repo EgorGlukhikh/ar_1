@@ -30,20 +30,22 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log("[MAX Bot] event:", JSON.stringify(body).slice(0, 300));
 
+    const type = body.update_type;
+
     // bot_started — fired when user opens the bot for the first time
-    if (body.update_type === "bot_started") {
-      const userId: number | undefined = body.user?.user_id ?? body.chat_id;
+    if (type === "bot_started") {
+      const userId: number | undefined =
+        body.user?.user_id ?? body.user_id ?? body.chat_id;
       if (userId) await sendWelcome(userId);
     }
 
-    // message_created — also handle /start typed manually
-    if (body.update_type === "message_created") {
-      const senderId: number | undefined = body.message?.sender?.user_id;
-      const text: string = body.message?.body?.text ?? "";
+    // message_created — handle /start typed manually or any message
+    if (type === "message_created") {
+      const senderId: number | undefined =
+        body.message?.sender?.user_id ?? body.sender?.user_id;
+      const text: string = body.message?.body?.text ?? body.message?.text ?? "";
 
-      if (senderId && (text.startsWith("/start") || text.trim() === "")) {
-        await sendWelcome(senderId);
-      }
+      if (senderId) await sendWelcome(senderId);
     }
 
     return NextResponse.json({ ok: true });

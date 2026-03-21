@@ -36,12 +36,14 @@ export function VideoPlayer({
   }
 
   if (videoType === "RUTUBE" && videoUrl) {
-    // Convert Rutube URL to embed
-    const rutubeId = getRutubeId(videoUrl);
+    const { id: rutubeId, privateKey } = getRutubeInfo(videoUrl);
+    const embedSrc = privateKey
+      ? `https://rutube.ru/play/embed/${rutubeId}/?p=${privateKey}`
+      : `https://rutube.ru/play/embed/${rutubeId}/`;
     return (
       <div className="relative overflow-hidden rounded-lg bg-black" style={{ aspectRatio: "16/9" }}>
         <iframe
-          src={`https://rutube.ru/play/embed/${rutubeId}/`}
+          src={embedSrc}
           className="absolute inset-0 h-full w-full"
           frameBorder="0"
           allow="clipboard-write; autoplay"
@@ -105,10 +107,16 @@ export function VideoPlayer({
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function getRutubeId(url: string): string {
-  // https://rutube.ru/video/HASH/ → HASH
+function getRutubeInfo(url: string): { id: string; privateKey?: string } {
+  // Private: https://rutube.ru/video/private/HASH/?p=KEY
+  const privateMatch = url.match(/rutube\.ru\/video\/private\/([a-z0-9]+)/i);
+  if (privateMatch) {
+    const keyMatch = url.match(/[?&]p=([^&]+)/);
+    return { id: privateMatch[1], privateKey: keyMatch?.[1] };
+  }
+  // Public: https://rutube.ru/video/HASH/
   const match = url.match(/rutube\.ru\/video\/([a-z0-9]+)/i);
-  return match?.[1] ?? url;
+  return { id: match?.[1] ?? url };
 }
 
 function getYandexDiskId(url: string): string {

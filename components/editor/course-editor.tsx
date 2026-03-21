@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Upload, Loader2 as UploadLoader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -246,30 +247,100 @@ export function CourseEditor({
           </div>
 
           {/* Cover image */}
-          <div className="rounded-lg border bg-white p-4 space-y-4">
-            <h2 className="font-semibold">Обложка</h2>
-            <div className="space-y-1">
-              <Label>URL изображения</Label>
-              <Input
-                value={course.coverImage ?? ""}
-                onChange={(e) => updateField("coverImage", e.target.value)}
-                placeholder="https://..."
-              />
-            </div>
-            {course.coverImage && (
-              <img
-                src={course.coverImage}
-                alt="Cover"
-                className="h-32 w-full rounded object-cover"
-              />
-            )}
-          </div>
+          <CoverImageUpload
+            value={course.coverImage ?? ""}
+            onChange={(url) => updateField("coverImage", url)}
+          />
 
           <Button className="w-full" onClick={save} disabled={saving}>
             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Сохранить изменения
           </Button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function CoverImageUpload({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload/image", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Ошибка загрузки");
+      onChange(data.url);
+      toast.success("Обложка загружена");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Ошибка загрузки");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="rounded-lg border bg-white p-4 space-y-3">
+      <h2 className="font-semibold">Обложка</h2>
+
+      {/* Preview */}
+      {value ? (
+        <div className="relative">
+          <img src={value} alt="Cover" className="h-36 w-full rounded-lg object-cover" />
+          <button
+            onClick={() => onChange("")}
+            className="absolute right-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white hover:bg-black/70"
+          >
+            ✕ Удалить
+          </button>
+        </div>
+      ) : (
+        <div
+          onClick={() => fileRef.current?.click()}
+          className="flex h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 text-gray-400 hover:border-primary hover:text-primary transition-colors"
+        >
+          {uploading ? (
+            <UploadLoader className="h-6 w-6 animate-spin" />
+          ) : (
+            <>
+              <Upload className="h-6 w-6" />
+              <span className="text-sm">Нажмите для загрузки</span>
+              <span className="text-xs">JPG, PNG, WebP до 5 МБ</span>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFile}
+      />
+
+      {/* URL fallback */}
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">или вставьте URL</Label>
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://..."
+          className="h-8 text-sm"
+        />
       </div>
     </div>
   );
