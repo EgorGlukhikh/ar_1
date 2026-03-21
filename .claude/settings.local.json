@@ -3,7 +3,8 @@
     "allow": [
       "Bash(nvm list:*)",
       "Bash(nvm use:*)",
-      "Bash(export PATH=\"/c/nvm4w/nodejs:$PATH\")"
+      "Bash(export PATH=\"/c/nvm4w/nodejs:$PATH\")",
+      "Bash(grep -rn asChild /d/AR/components /d/AR/app --include=*.tsx)"
     ]
   }
 }
