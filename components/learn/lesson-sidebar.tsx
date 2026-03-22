@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { CheckCircle, PlayCircle, BookOpen, Award, Lock, Menu, X, List } from "lucide-react";
 import { Progress } from "@/components/ui/progress";

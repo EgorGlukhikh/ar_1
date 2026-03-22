@@ -32,7 +32,7 @@ async function uploadToCloudinary(buffer: Buffer, contentType: string) {
   const preset = process.env.CLOUDINARY_UPLOAD_PRESET!;
 
   const form = new FormData();
-  form.append("file", new Blob([buffer], { type: contentType }));
+  form.append("file", new Blob([buffer.buffer as ArrayBuffer], { type: contentType }));
   form.append("upload_preset", preset);
   form.append("folder", "ar-academy/covers");
 

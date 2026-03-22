@@ -12,6 +12,7 @@ import {
   Award,
   MessageSquare,
   GraduationCap,
+  Wallet,
 } from "lucide-react";
 
 async function getStudentData(userId: string) {
@@ -33,17 +34,17 @@ async function getStudentData(userId: string) {
     }),
     prisma.certificate.count({ where: { userId } }),
     prisma.message.count({ where: { receiverId: userId, isRead: false } }),
-    prisma.user.findUnique({ where: { id: userId }, select: { telegramId: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { telegramId: true, balance: true } }),
   ]);
 
-  return { enrollments, certificates, unreadMessages, maxConnected: !!user?.telegramId };
+  return { enrollments, certificates, unreadMessages, maxConnected: !!user?.telegramId, balance: user?.balance ?? 0 };
 }
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session) redirect("/login");
 
-  const { enrollments, certificates, unreadMessages, maxConnected } =
+  const { enrollments, certificates, unreadMessages, maxConnected, balance } =
     await getStudentData(session.user.id);
 
   return (
@@ -58,7 +59,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+      <div className="mb-8 grid gap-4 sm:grid-cols-4">
         <Link href="/courses">
           <Card className="cursor-pointer transition-shadow hover:shadow-md">
             <CardContent className="flex items-center gap-4 pt-6">
@@ -98,6 +99,17 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
+        <Card>
+          <CardContent className="flex items-center gap-4 pt-6">
+            <div className="rounded-full bg-emerald-100 p-3">
+              <Wallet className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{balance.toLocaleString("ru")} ₽</p>
+              <p className="text-sm text-muted-foreground">Баланс</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* My courses */}
@@ -146,8 +158,8 @@ export default async function DashboardPage() {
                     {enrollment.completedAt ? (
                       <Badge className="bg-green-100 text-green-700">Завершён ✓</Badge>
                     ) : (
-                      <Button size="sm" className="w-full sm:w-auto" asChild>
-                        <span>Продолжить</span>
+                      <Button size="sm" className="w-full sm:w-auto">
+                        Продолжить
                       </Button>
                     )}
                   </div>

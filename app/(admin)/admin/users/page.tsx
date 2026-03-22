@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChangeRoleButton } from "@/components/admin/change-role-button";
 import { ResetProgressButton } from "@/components/admin/reset-progress-button";
+import { AddBalanceButton } from "@/components/admin/add-balance-button";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
@@ -36,6 +37,7 @@ export default async function AdminUsersPage({
     include: {
       _count: { select: { enrollments: true, courses: true } },
     },
+    // balance is selected from User by default
     orderBy: { createdAt: "desc" },
   });
 
@@ -89,7 +91,8 @@ export default async function AdminUsersPage({
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                  <AddBalanceButton userId={user.id} currentBalance={user.balance} />
                   <ResetProgressButton userId={user.id} userName={user.name ?? user.email} />
                   <ChangeRoleButton userId={user.id} currentRole={user.role} />
                 </div>

@@ -65,24 +65,26 @@ export default async function AdminDashboard() {
       {/* Stats grid */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {[
-          { label: "Пользователей", value: stats.totalUsers, icon: Users, color: "text-blue-600 bg-blue-100" },
-          { label: "Курсов", value: stats.publishedCourses, icon: BookOpen, color: "text-green-600 bg-green-100" },
-          { label: "Записей", value: stats.totalEnrollments, icon: TrendingUp, color: "text-purple-600 bg-purple-100" },
-          { label: "Сертификатов", value: stats.totalCertificates, icon: Award, color: "text-yellow-600 bg-yellow-100" },
-          { label: "ДЗ на проверке", value: stats.pendingSubmissions, icon: ClipboardList, color: "text-orange-600 bg-orange-100" },
-          { label: "Выручка", value: `${stats.revenue.toLocaleString()} ₽`, icon: CreditCard, color: "text-emerald-600 bg-emerald-100" },
+          { label: "Пользователей", value: stats.totalUsers, icon: Users, color: "text-blue-600 bg-blue-100", href: "/admin/users" },
+          { label: "Курсов", value: stats.publishedCourses, icon: BookOpen, color: "text-green-600 bg-green-100", href: "/admin/courses" },
+          { label: "Записей", value: stats.totalEnrollments, icon: TrendingUp, color: "text-purple-600 bg-purple-100", href: "/admin/users" },
+          { label: "Сертификатов", value: stats.totalCertificates, icon: Award, color: "text-yellow-600 bg-yellow-100", href: "/admin/users" },
+          { label: "ДЗ на проверке", value: stats.pendingSubmissions, icon: ClipboardList, color: "text-orange-600 bg-orange-100", href: "/curator/submissions" },
+          { label: "Выручка", value: `${stats.revenue.toLocaleString()} ₽`, icon: CreditCard, color: "text-emerald-600 bg-emerald-100", href: "/admin/payments" },
         ].map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="flex items-center gap-3 pt-5">
-              <div className={`rounded-full p-2.5 ${stat.color}`}>
-                <stat.icon className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xl font-bold">{stat.value}</p>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <Link key={stat.label} href={stat.href}>
+            <Card className="cursor-pointer transition-shadow hover:shadow-md">
+              <CardContent className="flex items-center gap-3 pt-5">
+                <div className={`rounded-full p-2.5 ${stat.color}`}>
+                  <stat.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 

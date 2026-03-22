@@ -20,6 +20,24 @@ async function main() {
   });
   console.log("✅ Admin created:", admin.email);
 
+  // ── Test users ──────────────────────────────────
+  const testPassword = await bcrypt.hash("12345", 10);
+  for (const u of [
+    { email: "maria@test.ru",   name: "Мария Иванова",   role: Role.STUDENT },
+    { email: "aleksey@test.ru", name: "Алексей Петров",  role: Role.STUDENT },
+    { email: "tatiana@test.ru", name: "Татьяна Смирнова",role: Role.STUDENT },
+    { email: "dmitry@test.ru",  name: "Дмитрий Козлов",  role: Role.STUDENT },
+    { email: "author@test.ru",  name: "Наталья Орлова",  role: Role.AUTHOR  },
+    { email: "curator@test.ru", name: "Сергей Волков",   role: Role.CURATOR },
+  ]) {
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: {},
+      create: { email: u.email, name: u.name, role: u.role, password: testPassword },
+    });
+  }
+  console.log("✅ Test users created");
+
   // ── Categories ──────────────────────────────────
   const categories = await Promise.all([
     prisma.category.upsert({

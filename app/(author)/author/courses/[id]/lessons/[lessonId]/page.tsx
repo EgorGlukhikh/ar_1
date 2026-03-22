@@ -17,7 +17,6 @@ export default async function LessonEditorPage({
     include: {
       quiz: { include: { questions: { include: { options: true } } } },
       assignment: true,
-      webinar: true,
     },
   });
 

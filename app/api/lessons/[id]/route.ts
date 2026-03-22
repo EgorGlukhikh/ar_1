@@ -12,7 +12,6 @@ export async function GET(
     include: {
       quiz: { include: { questions: { include: { options: true } } } },
       assignment: true,
-      webinar: true,
       attachments: true,
     },
   });

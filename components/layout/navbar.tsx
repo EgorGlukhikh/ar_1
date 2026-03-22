@@ -14,6 +14,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Navbar() {
   const { data: session } = useSession();
@@ -41,7 +42,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
@@ -51,7 +52,7 @@ export function Navbar() {
           >
             <GraduationCap className="h-4 w-4 text-white" />
           </div>
-          <span className="text-base font-bold text-gray-900">Академия Риэлторов</span>
+          <span className="text-base font-bold">Академия Риэлторов</span>
         </Link>
 
         {/* Center nav */}
@@ -66,7 +67,8 @@ export function Navbar() {
         </nav>
 
         {/* Auth area */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <ThemeToggle />
           {session ? (
             <>
               <Link href={getDashboardLink()} className="hidden md:block">
@@ -91,10 +93,10 @@ export function Navbar() {
                 </button>
 
                 {open && (
-                  <div className="absolute right-0 top-11 z-50 w-56 overflow-hidden rounded-xl border bg-white shadow-xl">
+                  <div className="absolute right-0 top-11 z-50 w-56 overflow-hidden rounded-xl border bg-popover shadow-xl">
                     {/* User info */}
                     <div className="border-b px-4 py-3">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{session.user.name}</p>
+                      <p className="text-sm font-semibold truncate">{session.user.name}</p>
                       <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
                     </div>
 
@@ -103,26 +105,26 @@ export function Navbar() {
                       <Link
                         href="/profile"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2 text-sm hover:bg-accent transition-colors"
                       >
-                        <User className="h-4 w-4 text-gray-400" />
+                        <User className="h-4 w-4 text-muted-foreground" />
                         Профиль
                       </Link>
                       <Link
                         href={getDashboardLink()}
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2 text-sm hover:bg-accent transition-colors"
                       >
-                        <LayoutDashboard className="h-4 w-4 text-gray-400" />
+                        <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
                         Кабинет
                       </Link>
                       {(session.user.role === "AUTHOR" || session.user.role === "ADMIN") && (
                         <Link
                           href="/author/analytics"
                           onClick={() => setOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm hover:bg-accent transition-colors"
                         >
-                          <BarChart3 className="h-4 w-4 text-gray-400" />
+                          <BarChart3 className="h-4 w-4 text-muted-foreground" />
                           Аналитика
                         </Link>
                       )}
@@ -130,9 +132,9 @@ export function Navbar() {
                         <Link
                           href="/admin"
                           onClick={() => setOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm hover:bg-accent transition-colors"
                         >
-                          <Settings className="h-4 w-4 text-gray-400" />
+                          <Settings className="h-4 w-4 text-muted-foreground" />
                           Администрирование
                         </Link>
                       )}
