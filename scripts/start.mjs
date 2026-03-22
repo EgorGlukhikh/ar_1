@@ -5,6 +5,11 @@
 import { execSync } from "child_process";
 import { PrismaClient } from "@prisma/client";
 
+// Подавляем npm warn: "Use --omit=dev instead"
+delete process.env.npm_config_production;
+// Подавляем баннер Prisma об обновлении (пишется в stderr → красные строки в Railway)
+process.env.PRISMA_HIDE_UPDATE_MESSAGE = "1";
+
 const run = (cmd) => {
   console.log(`▶ ${cmd}`);
   execSync(cmd, { stdio: "inherit" });
