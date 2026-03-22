@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+// GET — fetch block by id
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({}, { status: 401 });
+
+  const { id } = await params;
+  const block = await prisma.lessonBlock.findUnique({ where: { id } });
+  if (!block) return NextResponse.json({}, { status: 404 });
+  return NextResponse.json(block);
+}
+
 // PATCH — update block fields
 export async function PATCH(
   req: NextRequest,
