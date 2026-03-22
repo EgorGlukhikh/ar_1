@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   DndContext,
@@ -28,6 +28,15 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { BlockList, type LessonBlock } from "./block-list";
+import { AddBlockModal } from "./add-block-modal";
+
+const BLOCK_LABELS: Record<string, string> = {
+  VIDEO: "Видео",
+  TEXT: "Текст",
+  QUIZ: "Тест",
+  ASSIGNMENT: "Задание",
+  WEBINAR: "Вебинар",
+};
 
 interface Lesson {
   id: string;
@@ -119,10 +128,18 @@ function SortableLesson({
         )}
 
         <Badge variant="secondary" className="text-xs shrink-0">
-          {lesson.blocks.length} блоков
+          {lesson.blocks.length}{" "}
+          {lesson.blocks.length === 1
+            ? "блок"
+            : lesson.blocks.length < 5
+            ? "блока"
+            : "блоков"}
         </Badge>
         {lesson.isPreview && (
-          <Badge variant="outline" className="text-xs text-green-600 border-green-300 shrink-0">
+          <Badge
+            variant="outline"
+            className="text-xs text-green-600 border-green-300 shrink-0"
+          >
             Превью
           </Badge>
         )}
@@ -159,9 +176,8 @@ export function LessonList({
   lessons: Lesson[];
 }) {
   const [lessons, setLessons] = useState(initialLessons);
-  const [newTitle, setNewTitle] = useState("");
-  const [adding, setAdding] = useState(false);
-  const [showAdd, setShowAdd] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -180,26 +196,46 @@ export function LessonList({
     await fetch(`/api/modules/${moduleId}/reorder-lessons`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lessons: reordered.map((l) => ({ id: l.id, order: l.order })) }),
+      body: JSON.stringify({
+        lessons: reordered.map((l) => ({ id: l.id, order: l.order })),
+      }),
     });
   };
 
-  const addLesson = async () => {
-    if (!newTitle.trim()) return;
-    setAdding(true);
+  /**
+   * Нажатие «Добавить блок» на уровне модуля:
+   * 1. Создаём новый урок с автоназванием из типа блока
+   * 2. Добавляем в него выбранный блок
+   * 3. Урок появляется в списке развёрнутым
+   */
+  const handleAddBlockToNewLesson = async (type: string, title: string) => {
+    setCreating(true);
     try {
-      const res = await fetch(`/api/modules/${moduleId}/lessons`, {
+      const lessonTitle = title || BLOCK_LABELS[type] || type;
+
+      // 1. Создаём урок
+      const lessonRes = await fetch(`/api/modules/${moduleId}/lessons`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle, type: "VIDEO" }),
+        body: JSON.stringify({ title: lessonTitle, type }),
       });
-      const lesson = await res.json();
-      setLessons((p) => [...p, { ...lesson, blocks: [] }]);
-      setNewTitle("");
-      setShowAdd(false);
-      toast.success("Урок добавлен");
+      const newLesson = await lessonRes.json();
+
+      // 2. Добавляем первый блок в урок
+      const blockRes = await fetch(`/api/lessons/${newLesson.id}/blocks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, title: lessonTitle }),
+      });
+      const newBlock = await blockRes.json();
+
+      setLessons((prev) => [
+        ...prev,
+        { ...newLesson, blocks: [newBlock] },
+      ]);
+      toast.success("Блок добавлен");
     } finally {
-      setAdding(false);
+      setCreating(false);
     }
   };
 
@@ -237,32 +273,21 @@ export function LessonList({
         </SortableContext>
       </DndContext>
 
-      {showAdd ? (
-        <div className="mt-2 flex gap-2">
-          <Input
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            placeholder="Название урока"
-            className="h-8 text-xs"
-            onKeyDown={(e) => e.key === "Enter" && addLesson()}
-            autoFocus
-          />
-          <Button onClick={addLesson} disabled={adding} size="sm" className="h-8 text-xs">
-            {adding ? "..." : "Добавить"}
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => setShowAdd(false)}>
-            ✕
-          </Button>
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowAdd(true)}
-          className="mt-2 flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-600"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          Добавить урок
-        </button>
-      )}
+      {/* Кнопка «Добавить блок» с picker'ом типов */}
+      <button
+        onClick={() => setModalOpen(true)}
+        disabled={creating}
+        className="mt-2 flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+      >
+        <Plus className="h-3.5 w-3.5" />
+        {creating ? "Создаём..." : "Добавить блок"}
+      </button>
+
+      <AddBlockModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onAdd={handleAddBlockToNewLesson}
+      />
     </div>
   );
 }

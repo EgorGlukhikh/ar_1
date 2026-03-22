@@ -22,44 +22,56 @@ interface BlockTypeOption {
   label: string;
   description: string;
   icon: React.ReactNode;
-  color: string;
+  bg: string;
+  ring: string;
+  selectedBg: string;
 }
 
 const BLOCK_TYPES: BlockTypeOption[] = [
   {
     type: "VIDEO",
     label: "Видео",
-    description: "YouTube, Rutube, Яндекс Диск или загрузка",
-    icon: <PlayCircle className="h-6 w-6" />,
-    color: "text-blue-500 bg-blue-50 border-blue-100",
+    description: "YouTube, Rutube, Яндекс Диск или загрузка файла",
+    icon: <PlayCircle className="h-8 w-8" />,
+    bg: "bg-blue-50 text-blue-600",
+    ring: "ring-blue-300",
+    selectedBg: "bg-blue-100 border-blue-400",
   },
   {
     type: "TEXT",
     label: "Текст",
     description: "Статья, лекция, форматированный контент",
-    icon: <FileText className="h-6 w-6" />,
-    color: "text-gray-600 bg-gray-50 border-gray-100",
+    icon: <FileText className="h-8 w-8" />,
+    bg: "bg-gray-50 text-gray-600",
+    ring: "ring-gray-300",
+    selectedBg: "bg-gray-100 border-gray-400",
   },
   {
     type: "QUIZ",
     label: "Тест",
     description: "Вопросы с автоматической проверкой",
-    icon: <CheckSquare className="h-6 w-6" />,
-    color: "text-green-600 bg-green-50 border-green-100",
+    icon: <CheckSquare className="h-8 w-8" />,
+    bg: "bg-green-50 text-green-600",
+    ring: "ring-green-300",
+    selectedBg: "bg-green-100 border-green-400",
   },
   {
     type: "ASSIGNMENT",
     label: "Задание",
     description: "Домашнее задание с проверкой куратором",
-    icon: <ClipboardList className="h-6 w-6" />,
-    color: "text-orange-500 bg-orange-50 border-orange-100",
+    icon: <ClipboardList className="h-8 w-8" />,
+    bg: "bg-orange-50 text-orange-500",
+    ring: "ring-orange-300",
+    selectedBg: "bg-orange-100 border-orange-400",
   },
   {
     type: "WEBINAR",
     label: "Вебинар",
     description: "Запись эфира или ссылка на трансляцию",
-    icon: <Video className="h-6 w-6" />,
-    color: "text-purple-500 bg-purple-50 border-purple-100",
+    icon: <Video className="h-8 w-8" />,
+    bg: "bg-purple-50 text-purple-600",
+    ring: "ring-purple-300",
+    selectedBg: "bg-purple-100 border-purple-400",
   },
 ];
 
@@ -94,38 +106,53 @@ export function AddBlockModal({ open, onClose, onAdd }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Выберите тип блока</DialogTitle>
+          <DialogTitle className="text-base">Выберите тип блока</DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-2 mt-2 sm:grid-cols-3">
-          {BLOCK_TYPES.map((opt) => (
-            <button
-              key={opt.type}
-              onClick={() => setSelected(opt.type)}
-              className={`
-                flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-left transition-all
-                ${
-                  selected === opt.type
-                    ? "border-primary ring-2 ring-primary/20 " + opt.color
-                    : "border-transparent " + opt.color + " hover:border-current/30 hover:scale-[1.02]"
-                }
-              `}
-            >
-              <div className="self-start">{opt.icon}</div>
-              <div className="self-start">
-                <p className="text-sm font-semibold leading-tight">{opt.label}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground leading-tight">
-                  {opt.description}
-                </p>
-              </div>
-            </button>
-          ))}
+        {/* Сетка карточек типов блоков */}
+        <div className="grid grid-cols-2 gap-3 mt-1 sm:grid-cols-3">
+          {BLOCK_TYPES.map((opt) => {
+            const isSelected = selected === opt.type;
+            return (
+              <button
+                key={opt.type}
+                onClick={() => setSelected(opt.type)}
+                className={`
+                  relative flex flex-col gap-3 rounded-xl border-2 p-4 text-left
+                  transition-all duration-150
+                  ${
+                    isSelected
+                      ? `${opt.selectedBg} ring-2 ${opt.ring} shadow-sm`
+                      : "border-border bg-background hover:border-muted-foreground/30 hover:shadow-sm hover:-translate-y-0.5"
+                  }
+                `}
+              >
+                {/* Иконка в цветном кружке */}
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${opt.bg}`}>
+                  {opt.icon}
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold leading-tight">{opt.label}</p>
+                  <p className="mt-1 text-xs text-muted-foreground leading-tight">
+                    {opt.description}
+                  </p>
+                </div>
+
+                {/* Галочка при выборе */}
+                {isSelected && (
+                  <span className="absolute top-2 right-2 text-xs font-bold text-primary">✓</span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
+        {/* Поле названия появляется после выбора типа */}
         {selected && (
-          <div className="mt-3 space-y-2 border-t pt-3">
+          <div className="mt-2 space-y-1.5 rounded-lg border bg-muted/30 p-3">
             <label className="text-sm font-medium">Название блока</label>
             <Input
               autoFocus
@@ -133,6 +160,7 @@ export function AddBlockModal({ open, onClose, onAdd }: Props) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+              className="bg-background"
             />
           </div>
         )}
