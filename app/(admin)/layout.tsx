@@ -51,13 +51,20 @@ export default async function AdminLayout({
             </Link>
           ))}
         </nav>
-        <div className="border-t border-slate-700 px-4 py-4">
+        <div className="border-t border-slate-700 px-4 py-3 space-y-1">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-xs text-slate-400 transition-colors hover:text-white"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Лендинг
+          </Link>
           <Link
             href="/dashboard"
             className="flex items-center gap-2 text-xs text-slate-400 transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            На сайт
+            Кабинет студента
           </Link>
         </div>
       </aside>
@@ -67,8 +74,8 @@ export default async function AdminLayout({
         title="Администратор"
         navItems={navItems}
         dark={true}
-        backHref="/dashboard"
-        backLabel="На сайт"
+        backHref="/"
+        backLabel="Лендинг"
       />
 
       <div className="flex-1 bg-gray-50 min-w-0">

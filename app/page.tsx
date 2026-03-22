@@ -242,19 +242,15 @@ export default async function HomePage() {
             </div>
 
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {courses.map((course, i) => {
-                const gradients = [
-                  "linear-gradient(135deg, #7C5CFC, #C084FC)",
-                  "linear-gradient(135deg, #F97316, #FCD34D)",
-                  "linear-gradient(135deg, #22C55E, #86EFAC)",
-                  "linear-gradient(135deg, #EC4899, #F9A8D4)",
-                ];
+              {courses.map((course) => {
                 return (
                   <Link key={course.id} href={`/courses/${course.slug}`}>
                     <div className="group flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
-                      <div className="flex h-36 items-center justify-center" style={{ background: gradients[i % 4] }}>
-                        <GraduationCap className="h-14 w-14 text-white/70" />
-                      </div>
+                      <img
+                        src={course.coverImage || `https://picsum.photos/seed/${course.slug}/600/300`}
+                        alt={course.title}
+                        className="h-36 w-full object-cover"
+                      />
                       <div className="flex flex-1 flex-col p-5">
                         <p className="mb-1 text-xs font-medium text-gray-400">{course.author.name}</p>
                         <h3 className="mb-3 flex-1 font-bold leading-snug text-gray-900 line-clamp-2 group-hover:text-purple-600 transition-colors">

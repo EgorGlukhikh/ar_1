@@ -30,7 +30,8 @@
       "Bash(find \"D:\\\\AR/app\" -type d -name \"\\\\\\\\\\(student\\\\\\\\\\)\")",
       "Bash(ls \"D:/AR/app/\\(student\\)/courses/[slug]/learn/\")",
       "Bash(node -e \":*)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Bash(find \"D:/AR/app/\\(student\\)\" -name \"profile\" -type d)"
     ]
   }
 }

@@ -122,20 +122,11 @@ export default async function CoursesPage({
             {courses.map((course, i) => (
               <Link key={course.id} href={`/courses/${course.slug}`} className="group">
                 <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
-                  {course.coverImage ? (
-                    <img
-                      src={course.coverImage}
-                      alt={course.title}
-                      className="h-40 w-full object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="flex h-40 items-center justify-center"
-                      style={{ background: gradients[i % gradients.length] }}
-                    >
-                      <GraduationCap className="h-14 w-14 text-white/70" />
-                    </div>
-                  )}
+                  <img
+                    src={course.coverImage || `https://picsum.photos/seed/${course.slug}/600/300`}
+                    alt={course.title}
+                    className="h-40 w-full object-cover"
+                  />
                   <div className="flex flex-1 flex-col p-5">
                     <div className="mb-2 flex flex-wrap gap-1.5">
                       <Badge variant="secondary" className="text-xs">

@@ -71,11 +71,16 @@ export default async function CoursePage({
 
   if (!course) notFound();
 
-  const enrollment = session?.user?.id
-    ? await prisma.enrollment.findUnique({
-        where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
-      })
-    : null;
+  const [enrollment, userRecord] = await Promise.all([
+    session?.user?.id
+      ? prisma.enrollment.findUnique({
+          where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
+        })
+      : Promise.resolve(null),
+    session?.user?.id
+      ? prisma.user.findUnique({ where: { id: session.user.id }, select: { balance: true } })
+      : Promise.resolve(null),
+  ]);
 
   const isWebinar = course.type === "WEBINAR";
   const webinar = course.webinar;
@@ -247,12 +252,12 @@ export default async function CoursePage({
                       </Button>
                     </Link>
                   ) : (
-                    <EnrollButton courseId={course.id} slug={slug} isFree={course.isFree} price={course.price} />
+                    <EnrollButton courseId={course.id} slug={slug} isFree={course.isFree} price={course.price} userBalance={userRecord?.balance ?? 0} />
                   )}
 
                   {/* Webinar specific info */}
                   {isWebinar && webinar && enrollment && webinar.status === "SCHEDULED" && (
-                    <WebinarCountdown scheduledAt={webinar.scheduledAt} />
+                    <WebinarCountdown scheduledAt={webinar.scheduledAt.toISOString()} />
                   )}
 
                   <ul className="mt-5 space-y-3">

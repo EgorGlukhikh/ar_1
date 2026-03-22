@@ -29,6 +29,7 @@ model User {
   bio            String?
   phone          String?
   telegramId     String?
+  balance        Float     @default(0)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
