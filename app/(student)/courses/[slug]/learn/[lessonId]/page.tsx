@@ -97,6 +97,7 @@ export default async function LessonPage({ params }: PageProps) {
                 muxPlaybackId={lesson.muxPlaybackId}
                 title={lesson.title}
                 lessonId={lessonId}
+                subtitles={lesson.subtitles}
               />
             </div>
           )}

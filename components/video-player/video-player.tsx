@@ -2,7 +2,7 @@
 
 import { VideoType } from "@prisma/client";
 import dynamic from "next/dynamic";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useVideoAnalytics } from "@/hooks/use-video-analytics";
 
 // Mux Player (lazy load to avoid SSR issues)
@@ -13,7 +13,8 @@ interface VideoPlayerProps {
   videoUrl?: string | null;
   muxPlaybackId?: string | null;
   title?: string;
-  lessonId?: string;   // pass to enable behavior analytics
+  lessonId?: string;    // pass to enable behavior analytics
+  subtitles?: string | null; // WebVTT content from DB
   onEnded?: () => void;
 }
 
@@ -23,6 +24,7 @@ export function VideoPlayer({
   muxPlaybackId,
   title,
   lessonId,
+  subtitles,
   onEnded,
 }: VideoPlayerProps) {
   const { attachTo, push } = useVideoAnalytics({
@@ -31,6 +33,16 @@ export function VideoPlayer({
   });
 
   const videoElemRef = useRef<HTMLVideoElement | null>(null);
+
+  // Build a blob URL for the VTT so the <track> src works cross-origin
+  const [vttUrl, setVttUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!subtitles) { setVttUrl(null); return; }
+    const blob = new Blob([subtitles], { type: "text/vtt" });
+    const url = URL.createObjectURL(blob);
+    setVttUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [subtitles]);
 
   // Attach analytics to native <video> element
   useEffect(() => {
@@ -54,7 +66,17 @@ export function VideoPlayer({
             push("pause", Math.round(v.currentTime));
           }}
           style={{ width: "100%", aspectRatio: "16/9" }}
-        />
+        >
+          {vttUrl && (
+            <track
+              kind="subtitles"
+              src={vttUrl}
+              srcLang="ru"
+              label="Русский"
+              default
+            />
+          )}
+        </MuxPlayer>
       </div>
     );
   }
@@ -118,7 +140,17 @@ export function VideoPlayer({
           className="w-full"
           style={{ aspectRatio: "16/9" }}
           onEnded={onEnded}
-        />
+        >
+          {vttUrl && (
+            <track
+              kind="subtitles"
+              src={vttUrl}
+              srcLang="ru"
+              label="Русский"
+              default
+            />
+          )}
+        </video>
       </div>
     );
   }

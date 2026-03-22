@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RichTextEditor } from "./rich-text-editor";
 import { VideoPlayer } from "@/components/video-player/video-player";
 import { WebinarSettings } from "./webinar-settings";
-import { ArrowLeft, Save, Loader2, Eye } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Eye, Captions, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface Lesson {
@@ -30,6 +30,7 @@ interface Lesson {
   videoUrl: string | null;
   videoType: string | null;
   muxPlaybackId: string | null;
+  subtitles: string | null;
   isPreview: boolean;
   isFree: boolean;
 }
@@ -44,9 +45,32 @@ export function LessonEditor({
   const router = useRouter();
   const [lesson, setLesson] = useState(initialLesson);
   const [saving, setSaving] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
 
   const update = (field: keyof Lesson, value: unknown) => {
     setLesson((p) => ({ ...p, [field]: value }));
+  };
+
+  const transcribe = async () => {
+    setTranscribing(true);
+    try {
+      const res = await fetch(`/api/lessons/${lesson.id}/transcribe`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message ?? "Ошибка генерации субтитров");
+        return;
+      }
+      update("subtitles", data.vtt);
+      toast.success(`Субтитры созданы (${data.segmentCount} фрагментов)`);
+    } finally {
+      setTranscribing(false);
+    }
+  };
+
+  const deleteSubtitles = async () => {
+    await fetch(`/api/lessons/${lesson.id}/transcribe`, { method: "DELETE" });
+    update("subtitles", null);
+    toast.success("Субтитры удалены");
   };
 
   const save = async () => {
@@ -185,6 +209,58 @@ export function LessonEditor({
                       muxPlaybackId={lesson.muxPlaybackId}
                       title={lesson.title}
                     />
+                  </div>
+                )}
+
+                {/* Subtitles (Groq Whisper — free) */}
+                {lesson.videoType && lesson.videoType !== "YOUTUBE" &&
+                  lesson.videoType !== "RUTUBE" && lesson.videoType !== "VIMEO" &&
+                  lesson.videoType !== "YANDEX_DISK" &&
+                  (lesson.videoUrl || lesson.muxPlaybackId) && (
+                  <div className="rounded-lg border p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Captions className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Субтитры</span>
+                        {lesson.subtitles ? (
+                          <Badge className="border-0 bg-green-100 text-green-700 text-xs">Готовы</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs text-muted-foreground">Нет</Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        {lesson.subtitles && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-red-500 hover:text-red-700"
+                            onClick={deleteSubtitles}
+                          >
+                            <Trash2 className="mr-1 h-3.5 w-3.5" />
+                            Удалить
+                          </Button>
+                        )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={transcribe}
+                          disabled={transcribing}
+                        >
+                          {transcribing ? (
+                            <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Генерируем...</>
+                          ) : (
+                            <><Captions className="mr-1 h-3.5 w-3.5" />{lesson.subtitles ? "Пересоздать" : "Создать субтитры (Whisper)"}</>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="mt-1.5 text-xs text-muted-foreground">
+                      Groq Whisper AI — бесплатно, автоматическое распознавание речи на русском.
+                      Требуется <code className="rounded bg-muted px-1">GROQ_API_KEY</code> в .env
+                    </p>
                   </div>
                 )}
 
