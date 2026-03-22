@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -143,7 +143,7 @@ export function Navbar() {
                     {/* Sign out */}
                     <div className="border-t py-1">
                       <button
-                        onClick={() => { window.location.href = "/api/auth/signout"; }}
+                        onClick={() => signOut({ callbackUrl: "/landing" })}
                         className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <LogOut className="h-4 w-4" />
