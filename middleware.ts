@@ -31,28 +31,44 @@ export default auth((req) => {
 
   const role = session.user?.role;
 
-  // Admin routes
+  // Admin routes — also allow when admin is in preview mode
   if (ADMIN_ROUTES.some((r) => pathname.startsWith(r))) {
     if (role !== "ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
 
-  // Author routes
+  // Author routes — allow if admin (for role preview)
   if (AUTHOR_ROUTES.some((r) => pathname.startsWith(r))) {
     if (role !== "AUTHOR" && role !== "ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
 
-  // Curator routes
+  // Curator routes — allow if admin (for role preview)
   if (CURATOR_ROUTES.some((r) => pathname.startsWith(r))) {
     if (role !== "CURATOR" && role !== "ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+
+  // Set a client-readable cookie marking this as an admin session
+  // Used by RolePreviewBanner to know whether to show itself
+  if (role === "ADMIN") {
+    res.cookies.set("is_admin_session", "1", {
+      httpOnly: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+  } else {
+    // Clear the cookie if not admin (e.g. after logout)
+    res.cookies.delete("is_admin_session");
+  }
+
+  return res;
 });
 
 export const config = {

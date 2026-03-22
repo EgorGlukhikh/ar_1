@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, BookOpen, CreditCard, TrendingUp, Award, ClipboardList } from "lucide-react";
+import { Users, BookOpen, CreditCard, TrendingUp, Award, ClipboardList, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { RolePreviewSwitcher } from "@/components/admin/role-preview-switcher";
 
 async function getStats() {
   const [
@@ -60,7 +61,10 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="mb-8 text-2xl font-bold">Дашборд администратора</h1>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold">Дашборд администратора</h1>
+        <RolePreviewSwitcher />
+      </div>
 
       {/* Stats grid */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -178,6 +182,11 @@ export default async function AdminDashboard() {
         <Link href="/admin/payments">
           <Button variant="outline" size="sm" className="gap-1.5">
             <CreditCard className="h-4 w-4" /> Платежи
+          </Button>
+        </Link>
+        <Link href="/admin/analytics">
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <BarChart3 className="h-4 w-4" /> Аналитика
           </Button>
         </Link>
       </div>

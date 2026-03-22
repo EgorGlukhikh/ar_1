@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { RolePreviewBanner } from "@/components/admin/role-preview-banner";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <SessionProvider>
             {children}
+            <RolePreviewBanner />
             <Toaster richColors position="top-right" />
           </SessionProvider>
         </ThemeProvider>

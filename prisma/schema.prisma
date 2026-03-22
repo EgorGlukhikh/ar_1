@@ -52,6 +52,7 @@ model User {
   receivedMessages Message[]      @relation("ReceivedMessages")
   payments       Payment[]
   webinarAttendances WebinarAttendance[]
+  lessonEvents   LessonEvent[]
 }
 
 model Account {
@@ -187,6 +188,7 @@ model Lesson {
 
   module      Module      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   progress    LessonProgress[]
+  lessonEvents LessonEvent[]
   quiz        Quiz?
   assignment  Assignment?
   attachments Attachment[]
@@ -366,6 +368,36 @@ model LessonProgress {
   lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
+}
+
+// ──────────────────────────────────────────────
+// BEHAVIOR ANALYTICS
+// ──────────────────────────────────────────────
+
+// Triggered by: play, pause, seek, ended, visibility_hidden (tab close/switch)
+// payload examples:
+//   play:             { second: 42 }
+//   pause:            { second: 42, percent: 35 }
+//   seek:             { from: 30, to: 90 }
+//   ended:            { totalWatched: 180 }
+//   visibility_hidden:{ second: 42, percent: 35 }  — best proxy for "closed tab"
+//   heartbeat:        { second: 42, percent: 35 }  — every 10s while playing
+
+model LessonEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  event     String   // play | pause | seek | ended | visibility_hidden | heartbeat
+  second    Float?   // current video position in seconds
+  percent   Float?   // 0-100, current position as % of duration
+  payload   Json?    // extra data (from, to for seek, etc.)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId, event])
+  @@index([userId, lessonId])
 }
 
 // ──────────────────────────────────────────────

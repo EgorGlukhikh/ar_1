@@ -31,7 +31,15 @@
       "Bash(ls \"D:/AR/app/\\(student\\)/courses/[slug]/learn/\")",
       "Bash(node -e \":*)",
       "Bash(gh run:*)",
-      "Bash(find \"D:/AR/app/\\(student\\)\" -name \"profile\" -type d)"
+      "Bash(find \"D:/AR/app/\\(student\\)\" -name \"profile\" -type d)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "WebFetch(domain:www.thinkific.com)",
+      "WebFetch(domain:changelog.skillspace.ru)",
+      "WebFetch(domain:getcourse.ru)",
+      "WebFetch(domain:www.teachable.com)",
+      "WebFetch(domain:www.kajabi.com)",
+      "WebFetch(domain:www.podia.com)"
     ]
   }
 }
