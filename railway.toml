@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "npx prisma migrate resolve --rolled-back 20260321100000_add_user_balance_wallet 2>/dev/null; npx prisma migrate resolve --rolled-back 20260322000000_add_lesson_events 2>/dev/null; npx prisma migrate resolve --rolled-back 20260322010000_add_lesson_subtitles 2>/dev/null; npx prisma migrate resolve --rolled-back 20260322020000_add_lesson_blocks 2>/dev/null; npx prisma migrate deploy && npx prisma db seed && npx next start -p ${PORT:-3000}"
+startCommand = "node scripts/start.mjs"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
