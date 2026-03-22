@@ -6,7 +6,7 @@ export default async function RootPage() {
   const session = await auth();
 
   if (!session) {
-    redirect("/landing");
+    redirect("/login");
   }
 
   const role = session.user?.role;
