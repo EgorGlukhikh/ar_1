@@ -1,5 +1,5 @@
 -- Add balance field to User for internal wallet system
-ALTER TABLE "User" ADD COLUMN "balance" DOUBLE PRECISION NOT NULL DEFAULT 0;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "balance" DOUBLE PRECISION NOT NULL DEFAULT 0;
 
 -- Add CourseType enum if not exists (webinar restructure)
 DO $$ BEGIN
@@ -67,5 +67,3 @@ DO $$ BEGIN
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
-
--- Add webinarAttendances relation column is implicit via FK above

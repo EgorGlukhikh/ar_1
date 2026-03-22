@@ -17,8 +17,11 @@ CREATE TABLE IF NOT EXISTS "LessonBlock" (
   CONSTRAINT "LessonBlock_pkey" PRIMARY KEY ("id")
 );
 
-ALTER TABLE "LessonBlock"
-  ADD CONSTRAINT "LessonBlock_lessonId_fkey"
-  FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE "LessonBlock" ADD CONSTRAINT "LessonBlock_lessonId_fkey"
+    FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 CREATE INDEX IF NOT EXISTS "LessonBlock_lessonId_idx" ON "LessonBlock"("lessonId");
