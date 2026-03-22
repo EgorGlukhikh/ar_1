@@ -45,7 +45,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/landing" className="flex items-center gap-2">
           <div
             className="flex h-8 w-8 items-center justify-center rounded-xl"
             style={{ background: "linear-gradient(135deg, #7C5CFC, #9B5CF6)" }}

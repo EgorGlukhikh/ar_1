@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
 // Routes that don't require auth
-const PUBLIC_ROUTES = ["/", "/courses", "/login", "/register"];
+const PUBLIC_ROUTES = ["/", "/landing", "/courses", "/login", "/register"];
 // Routes that require specific roles
 const ADMIN_ROUTES = ["/admin"];
 const AUTHOR_ROUTES = ["/author"];
