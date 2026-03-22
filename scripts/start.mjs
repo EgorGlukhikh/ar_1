@@ -3,9 +3,7 @@
  * Запускается вместо голой строки в railway.toml.
  */
 import { execSync } from "child_process";
-import pkg from "@prisma/client";
-
-const { PrismaClient } = pkg;
+import { PrismaClient } from "@prisma/client";
 
 const run = (cmd) => {
   console.log(`▶ ${cmd}`);
@@ -40,6 +38,13 @@ async function fixFailedMigrations() {
   await fixFailedMigrations();
 
   run("npx prisma migrate deploy");
-  run("npx prisma db seed");
+
+  // Seed не должен валить деплой при повторных запусках
+  try {
+    run("npx prisma db seed");
+  } catch (e) {
+    console.warn("⚠ Seed завершился с ошибкой (не критично):", e.message);
+  }
+
   run(`npx next start -p ${process.env.PORT ?? 3000}`);
 })();
