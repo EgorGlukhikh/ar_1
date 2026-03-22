@@ -18,7 +18,10 @@ export default async function EditCoursePage({
       modules: {
         orderBy: { order: "asc" },
         include: {
-          lessons: { orderBy: { order: "asc" } },
+          lessons: {
+            orderBy: { order: "asc" },
+            include: { blocks: { orderBy: { order: "asc" } } },
+          },
         },
       },
       category: true,

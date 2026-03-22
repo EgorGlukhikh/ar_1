@@ -24,9 +24,12 @@ import Link from "next/link";
 
 interface Category { id: string; name: string }
 
+interface LessonBlock { id: string; type: string; order: number; title: string | null; }
+
 interface Lesson {
   id: string; title: string; order: number; type: string;
   isPreview: boolean; videoType: string | null; videoUrl: string | null;
+  blocks: LessonBlock[];
 }
 
 interface Module {

@@ -45,6 +45,7 @@ export default async function LessonPage({ params }: PageProps) {
       quiz: { include: { questions: { include: { options: true } } } },
       assignment: true,
       attachments: true,
+      blocks: { orderBy: { order: "asc" } },
     },
   });
 
@@ -75,6 +76,8 @@ export default async function LessonPage({ params }: PageProps) {
   const currentIndex = allLessons.findIndex((l) => l.id === lessonId);
   const nextLesson = allLessons[currentIndex + 1] ?? null;
 
+  const hasBlocks = lesson.blocks.length > 0;
+
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
       {/* Sidebar */}
@@ -88,21 +91,9 @@ export default async function LessonPage({ params }: PageProps) {
       {/* Main */}
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-4xl p-4 pb-28 lg:p-6 lg:pb-6">
-          {/* Video */}
-          {lesson.type === "VIDEO" && (lesson.videoType || lesson.muxPlaybackId) && (
-            <div className="mb-6">
-              <VideoPlayer
-                videoType={lesson.videoType ?? "UPLOAD"}
-                videoUrl={lesson.videoUrl}
-                muxPlaybackId={lesson.muxPlaybackId}
-                title={lesson.title}
-                lessonId={lessonId}
-                subtitles={lesson.subtitles}
-              />
-            </div>
-          )}
 
-          <div className="flex flex-wrap items-start justify-between gap-3">
+          {/* Lesson title + complete button */}
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
             <h1 className="text-xl font-bold sm:text-2xl">{lesson.title}</h1>
             {enrollment && (
               <CompleteButton
@@ -115,12 +106,79 @@ export default async function LessonPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Text content */}
-          {lesson.content && (
-            <LessonContent content={lesson.content} className="mt-6" />
+          {/* ── BLOCKS (new hierarchy) ─────────────────────── */}
+          {hasBlocks && lesson.blocks.map((block) => (
+            <div key={block.id} className="mb-8">
+              {block.title && (
+                <h2 className="mb-3 text-lg font-semibold">{block.title}</h2>
+              )}
+
+              {/* Video block */}
+              {block.type === "VIDEO" && (block.videoType || block.muxPlaybackId) && (
+                <VideoPlayer
+                  videoType={(block.videoType as "YOUTUBE" | "RUTUBE" | "YANDEX_DISK" | "VIMEO" | "UPLOAD") ?? "UPLOAD"}
+                  videoUrl={block.videoUrl}
+                  muxPlaybackId={block.muxPlaybackId}
+                  title={block.title ?? lesson.title}
+                  lessonId={lessonId}
+                  subtitles={block.subtitles}
+                />
+              )}
+
+              {/* Text block */}
+              {block.type === "TEXT" && block.content && (
+                <LessonContent content={block.content} />
+              )}
+
+              {/* Quiz / Assignment blocks rendered below per-lesson (linked by lessonId) */}
+            </div>
+          ))}
+
+          {/* ── LEGACY CONTENT (lessons without blocks) ───── */}
+          {!hasBlocks && (
+            <>
+              {/* Video */}
+              {lesson.type === "VIDEO" && (lesson.videoType || lesson.muxPlaybackId) && (
+                <div className="mb-6">
+                  <VideoPlayer
+                    videoType={lesson.videoType ?? "UPLOAD"}
+                    videoUrl={lesson.videoUrl}
+                    muxPlaybackId={lesson.muxPlaybackId}
+                    title={lesson.title}
+                    lessonId={lessonId}
+                    subtitles={lesson.subtitles}
+                  />
+                </div>
+              )}
+
+              {/* Text content */}
+              {lesson.content && (
+                <LessonContent content={lesson.content} className="mt-6" />
+              )}
+
+              {/* Quiz */}
+              {lesson.type === "QUIZ" && lesson.quiz && enrollment && (
+                <div className="mt-6">
+                  <QuizBlock
+                    quiz={lesson.quiz}
+                    onPassed={() => {}}
+                  />
+                </div>
+              )}
+
+              {/* Assignment */}
+              {lesson.type === "ASSIGNMENT" && lesson.assignment && enrollment && (
+                <div className="mt-6">
+                  <AssignmentBlock
+                    assignment={lesson.assignment}
+                    onApproved={() => {}}
+                  />
+                </div>
+              )}
+            </>
           )}
 
-          {/* Attachments */}
+          {/* Attachments (always shown) */}
           {lesson.attachments.length > 0 && (
             <div className="mt-6">
               <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -140,32 +198,6 @@ export default async function LessonPage({ params }: PageProps) {
               </div>
             </div>
           )}
-
-          {/* Quiz */}
-          {lesson.type === "QUIZ" && lesson.quiz && enrollment && (
-            <div className="mt-6">
-              <QuizBlock
-                quiz={lesson.quiz}
-                onPassed={() => {
-                  // CompleteButton will handle marking complete
-                }}
-              />
-            </div>
-          )}
-
-          {/* Assignment */}
-          {lesson.type === "ASSIGNMENT" && lesson.assignment && enrollment && (
-            <div className="mt-6">
-              <AssignmentBlock
-                assignment={lesson.assignment}
-                onApproved={() => {
-                  // auto-mark complete when approved
-                }}
-              />
-            </div>
-          )}
-
-          {/* Webinar lesson type removed — webinars are now top-level course type */}
         </div>
       </div>
     </div>

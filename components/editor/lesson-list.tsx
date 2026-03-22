@@ -6,13 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   DndContext,
   closestCenter,
   PointerSensor,
@@ -31,46 +24,39 @@ import {
   GripVertical,
   Plus,
   Trash2,
-  PlayCircle,
-  BookOpen,
-  CheckCircle,
-  Award,
-  Edit,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
-import Link from "next/link";
+import { BlockList, type LessonBlock } from "./block-list";
 
 interface Lesson {
-  id: string; title: string; order: number; type: string;
-  isPreview: boolean; videoType: string | null; videoUrl: string | null;
+  id: string;
+  title: string;
+  order: number;
+  type: string;
+  isPreview: boolean;
+  videoType: string | null;
+  videoUrl: string | null;
+  blocks: LessonBlock[];
 }
-
-const typeIcons: Record<string, React.ReactNode> = {
-  VIDEO: <PlayCircle className="h-3.5 w-3.5 text-blue-500" />,
-  TEXT: <BookOpen className="h-3.5 w-3.5 text-gray-400" />,
-  QUIZ: <CheckCircle className="h-3.5 w-3.5 text-green-500" />,
-  ASSIGNMENT: <Award className="h-3.5 w-3.5 text-orange-400" />,
-  WEBINAR: <PlayCircle className="h-3.5 w-3.5 text-purple-500" />,
-};
-
-const typeLabels: Record<string, string> = {
-  VIDEO: "Видео",
-  TEXT: "Текст",
-  QUIZ: "Тест",
-  ASSIGNMENT: "Задание",
-  WEBINAR: "Вебинар",
-};
 
 function SortableLesson({
   lesson,
   moduleId,
   courseId,
   onDelete,
+  onRename,
 }: {
   lesson: Lesson;
   moduleId: string;
   courseId: string;
   onDelete: (id: string) => void;
+  onRename: (id: string, title: string) => void;
 }) {
+  const [expanded, setExpanded] = useState(true);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [title, setTitle] = useState(lesson.title);
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: lesson.id });
 
@@ -80,39 +66,85 @@ function SortableLesson({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const saveTitle = async () => {
+    setEditingTitle(false);
+    if (title === lesson.title) return;
+    await fetch(`/api/lessons/${lesson.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
+    });
+    onRename(lesson.id, title);
+  };
+
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center gap-2 rounded-md border bg-gray-50 p-2 mb-1.5"
-    >
-      <button {...attributes} {...listeners} className="cursor-grab text-gray-300 hover:text-gray-500">
-        <GripVertical className="h-3.5 w-3.5" />
-      </button>
-
-      <span>{typeIcons[lesson.type]}</span>
-      <span className="flex-1 text-sm line-clamp-1">{lesson.title}</span>
-
-      <Badge variant="outline" className="text-xs">
-        {typeLabels[lesson.type]}
-      </Badge>
-      {lesson.isPreview && (
-        <Badge variant="outline" className="text-xs text-green-600 border-green-300">
-          Превью
-        </Badge>
-      )}
-
-      <Link href={`/author/courses/${courseId}/lessons/${lesson.id}`}>
-        <button className="text-gray-400 hover:text-blue-500">
-          <Edit className="h-3.5 w-3.5" />
+    <div ref={setNodeRef} style={style} className="mb-2">
+      {/* Lesson header row */}
+      <div className="flex items-center gap-2 rounded-md border bg-gray-50 p-2">
+        <button
+          {...attributes}
+          {...listeners}
+          className="cursor-grab text-gray-300 hover:text-gray-500"
+        >
+          <GripVertical className="h-3.5 w-3.5" />
         </button>
-      </Link>
-      <button
-        onClick={() => onDelete(lesson.id)}
-        className="text-gray-300 hover:text-red-500"
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </button>
+
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          {expanded ? (
+            <ChevronDown className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronRight className="h-3.5 w-3.5" />
+          )}
+        </button>
+
+        {editingTitle ? (
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={saveTitle}
+            onKeyDown={(e) => e.key === "Enter" && saveTitle()}
+            className="h-6 text-xs flex-1"
+            autoFocus
+          />
+        ) : (
+          <button
+            className="flex-1 text-left text-sm font-medium hover:text-blue-600 line-clamp-1"
+            onClick={() => setEditingTitle(true)}
+          >
+            {lesson.title}
+          </button>
+        )}
+
+        <Badge variant="secondary" className="text-xs shrink-0">
+          {lesson.blocks.length} блоков
+        </Badge>
+        {lesson.isPreview && (
+          <Badge variant="outline" className="text-xs text-green-600 border-green-300 shrink-0">
+            Превью
+          </Badge>
+        )}
+
+        <button
+          onClick={() => onDelete(lesson.id)}
+          className="text-gray-300 hover:text-red-500 shrink-0"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      {/* Blocks inside lesson */}
+      {expanded && (
+        <div className="mt-1 ml-6">
+          <BlockList
+            lessonId={lesson.id}
+            courseId={courseId}
+            blocks={lesson.blocks}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -128,7 +160,6 @@ export function LessonList({
 }) {
   const [lessons, setLessons] = useState(initialLessons);
   const [newTitle, setNewTitle] = useState("");
-  const [newType, setNewType] = useState("VIDEO");
   const [adding, setAdding] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
 
@@ -160,10 +191,10 @@ export function LessonList({
       const res = await fetch(`/api/modules/${moduleId}/lessons`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle, type: newType }),
+        body: JSON.stringify({ title: newTitle, type: "VIDEO" }),
       });
       const lesson = await res.json();
-      setLessons((p) => [...p, lesson]);
+      setLessons((p) => [...p, { ...lesson, blocks: [] }]);
       setNewTitle("");
       setShowAdd(false);
       toast.success("Урок добавлен");
@@ -176,6 +207,10 @@ export function LessonList({
     await fetch(`/api/lessons/${id}`, { method: "DELETE" });
     setLessons((p) => p.filter((l) => l.id !== id));
     toast.success("Урок удалён");
+  };
+
+  const renameLesson = (id: string, title: string) => {
+    setLessons((p) => p.map((l) => (l.id === id ? { ...l, title } : l)));
   };
 
   return (
@@ -196,6 +231,7 @@ export function LessonList({
               moduleId={moduleId}
               courseId={courseId}
               onDelete={deleteLesson}
+              onRename={renameLesson}
             />
           ))}
         </SortableContext>
@@ -203,18 +239,6 @@ export function LessonList({
 
       {showAdd ? (
         <div className="mt-2 flex gap-2">
-          <Select value={newType} onValueChange={(v) => setNewType(v ?? "VIDEO")}>
-            <SelectTrigger className="w-32 h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="VIDEO">Видео</SelectItem>
-              <SelectItem value="TEXT">Текст</SelectItem>
-              <SelectItem value="QUIZ">Тест</SelectItem>
-              <SelectItem value="ASSIGNMENT">Задание</SelectItem>
-              <SelectItem value="WEBINAR">Вебинар</SelectItem>
-            </SelectContent>
-          </Select>
           <Input
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}

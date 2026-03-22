@@ -24,9 +24,12 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import { LessonList } from "./lesson-list";
 
+interface LessonBlock { id: string; type: string; order: number; title: string | null; }
+
 interface Lesson {
   id: string; title: string; order: number; type: string;
   isPreview: boolean; videoType: string | null; videoUrl: string | null;
+  blocks: LessonBlock[];
 }
 
 interface Module { id: string; title: string; order: number; lessons: Lesson[] }
@@ -102,7 +105,7 @@ function SortableModule({
             )}
 
             <Badge variant="secondary" className="text-xs">
-              {module.lessons.length} уроков
+              {module.lessons.length} {module.lessons.length === 1 ? "урок" : module.lessons.length < 5 ? "урока" : "уроков"}
             </Badge>
             <button
               onClick={() => onDelete(module.id)}
