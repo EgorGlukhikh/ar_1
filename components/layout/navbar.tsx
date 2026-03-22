@@ -236,7 +236,11 @@ export function Navbar() {
                     {/* Sign out */}
                     <div className="border-t py-1">
                       <button
-                        onClick={() => signOut({ callbackUrl: "/login" })}
+                        onClick={async () => {
+                          setOpen(false);
+                          await signOut({ redirect: false });
+                          window.location.href = "/login";
+                        }}
                         className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <LogOut className="h-4 w-4" />
