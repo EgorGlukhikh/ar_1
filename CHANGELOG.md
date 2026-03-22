@@ -4,6 +4,32 @@
 
 ---
 
+## 2026-03-22 (продолжение сессии)
+
+### fix: выход из портала (разлогин)
+- Заменён `window.location.href = "/api/auth/signout"` (GET, вызывал client-side exception)
+  на `signOut({ callbackUrl: "/landing" })` из `next-auth/react`
+- После выхода пользователь попадает на `/landing`
+
+### fix: Railway — зависшие миграции (Deployment failed loop)
+- Все SQL-миграции приведены к идемпотентному виду:
+  `ADD COLUMN IF NOT EXISTS`, `CREATE TABLE IF NOT EXISTS`,
+  `ADD CONSTRAINT` обёрнут в `DO $$ BEGIN...EXCEPTION WHEN duplicate_object END $$`
+- `railway.toml`: перед `prisma migrate deploy` добавлен
+  `prisma migrate resolve --rolled-back` для каждой миграции —
+  сбрасывает `failed`-флаг при повторном деплое
+
+### feat: иерархия Курс → Модули → Уроки → Блоки (UX-рефакторинг)
+- Кнопка «Добавить урок» в модуле → «Добавить блок»
+- При клике открывается picker с карточками типов блоков:
+  Видео / Текст / Тест / Задание / Вебинар
+- Выбор типа → автосоздание урока-контейнера + блок внутрь
+- `AddBlockModal`: карточки с цветными иконками в кружках,
+  hover-эффект `-translate-y-0.5`, галочка при выборе,
+  поле названия появляется после выбора типа
+
+---
+
 ## 2026-03-22
 
 ### feat: бесплатные субтитры через Groq Whisper AI
