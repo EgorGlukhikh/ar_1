@@ -13,6 +13,7 @@ import {
   User,
   BarChart3,
   Eye,
+  ChevronDown,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -144,7 +145,7 @@ export function Navbar() {
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setOpen((v) => !v)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full ring-2 ring-transparent transition-all hover:ring-purple-200 focus:outline-none focus:ring-purple-300"
+                  className="flex items-center gap-1 rounded-full ring-2 ring-transparent transition-all hover:ring-purple-200 focus:outline-none focus:ring-purple-300"
                 >
                   <Avatar className="h-9 w-9">
                     <AvatarImage src={session.user.image ?? ""} />
@@ -152,6 +153,7 @@ export function Navbar() {
                       {session.user.name?.[0]?.toUpperCase() ?? "U"}
                     </AvatarFallback>
                   </Avatar>
+                  <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                 </button>
 
                 {open && (
@@ -235,17 +237,18 @@ export function Navbar() {
 
                     {/* Sign out */}
                     <div className="border-t py-1">
-                      <button
-                        onClick={async () => {
+                      <a
+                        href="/signout"
+                        onClick={async (e) => {
+                          e.preventDefault();
                           setOpen(false);
-                          await signOut({ redirect: false });
-                          window.location.href = "/login";
+                          await signOut({ callbackUrl: "/login" });
                         }}
                         className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <LogOut className="h-4 w-4" />
                         Выйти
-                      </button>
+                      </a>
                     </div>
                   </div>
                 )}
