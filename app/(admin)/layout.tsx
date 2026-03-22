@@ -7,6 +7,7 @@ import {
   BookOpen,
   Users,
   CreditCard,
+  BarChart3,
   ArrowLeft,
 } from "lucide-react";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
@@ -16,6 +17,7 @@ const navItems = [
   { href: "/admin/courses", label: "Все курсы", icon: BookOpen },
   { href: "/admin/users", label: "Пользователи", icon: Users },
   { href: "/admin/payments", label: "Платежи", icon: CreditCard },
+  { href: "/admin/analytics", label: "Аналитика", icon: BarChart3 },
 ];
 
 export default async function AdminLayout({

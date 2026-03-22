@@ -2,6 +2,8 @@
 
 import { VideoType } from "@prisma/client";
 import dynamic from "next/dynamic";
+import { useRef, useEffect } from "react";
+import { useVideoAnalytics } from "@/hooks/use-video-analytics";
 
 // Mux Player (lazy load to avoid SSR issues)
 const MuxPlayer = dynamic(() => import("@mux/mux-player-react"), { ssr: false });
@@ -11,6 +13,7 @@ interface VideoPlayerProps {
   videoUrl?: string | null;
   muxPlaybackId?: string | null;
   title?: string;
+  lessonId?: string;   // pass to enable behavior analytics
   onEnded?: () => void;
 }
 
@@ -19,8 +22,21 @@ export function VideoPlayer({
   videoUrl,
   muxPlaybackId,
   title,
+  lessonId,
   onEnded,
 }: VideoPlayerProps) {
+  const { attachTo, push } = useVideoAnalytics({
+    lessonId: lessonId ?? "__noop__",
+    enabled: !!lessonId,
+  });
+
+  const videoElemRef = useRef<HTMLVideoElement | null>(null);
+
+  // Attach analytics to native <video> element
+  useEffect(() => {
+    return attachTo(videoElemRef.current);
+  }, [attachTo]);
+
   if (videoType === "UPLOAD" && muxPlaybackId) {
     return (
       <div className="overflow-hidden rounded-lg bg-black">
@@ -28,7 +44,15 @@ export function VideoPlayer({
           playbackId={muxPlaybackId}
           metadata={{ video_title: title }}
           streamType="on-demand"
-          onEnded={onEnded}
+          onEnded={() => { push("ended"); onEnded?.(); }}
+          onPlay={(e) => {
+            const v = (e.target as HTMLVideoElement);
+            push("play", Math.round(v.currentTime));
+          }}
+          onPause={(e) => {
+            const v = (e.target as HTMLVideoElement);
+            push("pause", Math.round(v.currentTime));
+          }}
           style={{ width: "100%", aspectRatio: "16/9" }}
         />
       </div>
@@ -81,11 +105,12 @@ export function VideoPlayer({
     );
   }
 
-  // Fallback: direct video file
+  // Fallback: direct video file — full analytics support
   if (videoUrl) {
     return (
       <div className="overflow-hidden rounded-lg bg-black">
         <video
+          ref={videoElemRef}
           src={videoUrl}
           controls
           onContextMenu={(e) => e.preventDefault()}
@@ -108,19 +133,16 @@ export function VideoPlayer({
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getRutubeInfo(url: string): { id: string; privateKey?: string } {
-  // Private: https://rutube.ru/video/private/HASH/?p=KEY
   const privateMatch = url.match(/rutube\.ru\/video\/private\/([a-z0-9]+)/i);
   if (privateMatch) {
     const keyMatch = url.match(/[?&]p=([^&]+)/);
     return { id: privateMatch[1], privateKey: keyMatch?.[1] };
   }
-  // Public: https://rutube.ru/video/HASH/
   const match = url.match(/rutube\.ru\/video\/([a-z0-9]+)/i);
   return { id: match?.[1] ?? url };
 }
 
 function getYandexDiskId(url: string): string {
-  // Extract last segment from Yandex Disk share URL
   const match = url.match(/disk\.yandex\.ru\/i\/([^/?]+)/);
   return match?.[1] ?? url;
 }
